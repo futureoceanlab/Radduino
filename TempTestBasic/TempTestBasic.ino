@@ -34,7 +34,8 @@
   linked on Page 35 of the TMP117's datasheet
 */
 
-#include <Wire.h>            // Used to establish serial communication on the I2C bus
+//#include <Wire.h>            // Used to establish serial communication on the I2C bus
+#include <i2c_t3.h>
 #include <SparkFun_TMP117.h> // Used to send and recieve specific information from our sensor
 
 // The default address of the device is 0x48 = (GND)
@@ -45,23 +46,27 @@ char outline[100];
 void setup()
 {
   uint16_t regdata = 0;
-  Wire.begin();
+  //Wire.begin();
+  Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, 400000);
+  Wire.setDefaultTimeout(200000); // 200ms
   Serial1.setTX(26);
   Serial1.setRX(27);
   Serial1.begin(115200,SERIAL_8N1);    // Start serial communication at 115200 baud
-  Wire.setClock(400000);   // Set clock speed to be the fastest for better communication (fast mode)
+  //Wire.setClock(100000);   // Set clock speed to be the fastest for better communication (fast mode)
 
   Serial1.println("TMP117 Example 1: Basic Readings");
   if (sensor.begin() == true) // Function to check if the sensor will correctly self-identify with the proper Device ID/Address
   {
+    Serial1.println(sensor.dataReady());
     Serial1.println("Begin");
-
+    sensor.setContinuousConversionMode();
+    Serial1.println("Starting register read");
     for (int i = 0; i < 10; i++)
     {
       regdata = sensor.readRegister(regmap[i]);
       sprintf(outline, "Register %X: %X",regmap[i], regdata);
+      Serial1.println(outline);
     }    
-    sensor.setContinuousConversionMode();
   }
   else
   {
@@ -76,6 +81,7 @@ void loop()
   //Serial1.println("Starting loop");
   if (sensor.dataReady() == true) // Function to make sure that there is data ready to be printed, only prints temperature values when data is ready
   {
+    
     float tempC = sensor.readTempC();
     float tempF = sensor.readTempF();
     // Print temperature in °C and °F
@@ -85,5 +91,6 @@ void loop()
     Serial1.print("Temperature in Fahrenheit: ");
     Serial1.println(tempF);
     delay(500); // Delay added for easier readings
+    
   }
 }

@@ -32,7 +32,8 @@ Distributed as-is; no warranty is given.
 */
 
 #include <Arduino.h>
-#include <Wire.h>
+//#include <Wire.h>
+#include <i2c_t3.h>
 #include "SparkFun_TMP117_Registers.h"
 #include "SparkFun_TMP117.h"
 
@@ -53,7 +54,7 @@ TMP117::TMP117()
 	with setting the wire for the I2C Communication. 
 	This will return true if both checks pass.
 */
-bool TMP117::begin(uint8_t sensorAddress, TwoWire &wirePort)
+bool TMP117::begin(uint8_t sensorAddress, i2c_t3 &wirePort)
 {
 	_i2cPort = &wirePort;			// Chooses the wire port of the device
 	_deviceAddress = sensorAddress; // Sets the address of the device
@@ -100,10 +101,10 @@ uint16_t TMP117::readRegister(uint8_t reg) // originally TMP117_Register reg
 
 	uint8_t data[2] = {0};	 // Declares an array of length 2 to be empty
 	int16_t datac = 0;		   // Declares the return variable to be 0
-	if (Wire.available() <= 2) // Won't read more than 2 bits
+	if (_i2cPort->available() <= 2) // Won't read more than 2 bits
 	{
-		data[0] = Wire.read();				// Reads the first set of bits (D15-D8)
-		data[1] = Wire.read();				// Reads the second set of bits (D7-D0)
+		data[0] = _i2cPort->read();				// Reads the first set of bits (D15-D8)
+		data[1] = _i2cPort->read();				// Reads the second set of bits (D7-D0)
 		datac = ((data[0] << 8) | data[1]); // Swap the LSB and the MSB
 	}
 	return datac;

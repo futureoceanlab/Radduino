@@ -21,7 +21,8 @@ Distributed as-is; no warranty is given.
 #ifndef __SparkFun_TMP117_H__
 #define __SparkFun_TMP117_H__
 
-#include <Wire.h>
+//#include <Wire.h>
+#include <i2c_t3.h>
 #include <Arduino.h>
 #include "SparkFun_TMP117_Registers.h"
 
@@ -67,7 +68,7 @@ class TMP117
 public:
 	TMP117(); // Constructor
 
-	bool begin(uint8_t sensorAddress = 0x48, TwoWire &wirePort = Wire); // Checks for ACK over I2C, and sets the device ID of the TMP and chooses the wire port
+	bool begin(uint8_t sensorAddress = 0x48, i2c_t3 &wirePort = Wire); // Checks for ACK over I2C, and sets the device ID of the TMP and chooses the wire port
 	uint8_t getAddress();												// Returns the address of the device
 	double readTempC();													// Returns the temperature in degrees C
 	double readTempF();													// Converts readTempC result to degrees F
@@ -93,7 +94,8 @@ public:
 	void writeRegister(uint8_t reg, uint16_t data); // Wires single byte of data to the sensor
 
 private:
-	TwoWire *_i2cPort = NULL; //The generic connection to user's chosen I2C hardware
+	//TwoWire *_i2cPort = NULL; //The generic connection to user's chosen I2C hardware
+	i2c_t3 *_i2cPort = NULL;
 	uint8_t _deviceAddress;   // Address of Temperature sensor
 
 };

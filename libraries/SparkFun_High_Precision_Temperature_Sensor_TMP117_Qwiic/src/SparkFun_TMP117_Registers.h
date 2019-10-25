@@ -32,7 +32,7 @@ Distributed as-is; no warranty is given.
 */
 
 // Address of the registers. This can be found on page 23 of the datasheet
-enum TMP117_Register
+/*enum TMP117_Register
 {
   TMP117_TEMP_RESULT = 0X00,
   TMP117_CONFIGURATION = 0x01,
@@ -45,5 +45,17 @@ enum TMP117_Register
   TMP117_EEPROM3 = 0X08,
   TMP117_DEVICE_ID = 0X0F
 };
+*/
+
+#define TMP117_TEMP_RESULT  0X00
+#define TMP117_CONFIGURATION  0x01
+#define TMP117_T_HIGH_LIMIT  0X02
+#define TMP117_T_LOW_LIMIT  0X03
+#define TMP117_EEPROM_UL  0X04
+#define TMP117_EEPROM1  0X05
+#define TMP117_EEPROM2  0X06
+#define TMP117_TEMP_OFFSET  0X07
+#define TMP117_EEPROM3  0X08
+#define TMP117_DEVICE_ID  0X0F
 
 #endif
