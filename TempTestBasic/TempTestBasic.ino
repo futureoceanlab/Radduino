@@ -39,9 +39,12 @@
 
 // The default address of the device is 0x48 = (GND)
 TMP117 sensor; // Initalize sensor
+uint8_t regmap[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 0x0F};
+char outline[100];
 
 void setup()
 {
+  uint16_t regdata = 0;
   Wire.begin();
   Serial1.begin(115200,SERIAL_8N1);    // Start serial communication at 115200 baud
   Wire.setClock(400000);   // Set clock speed to be the fastest for better communication (fast mode)
@@ -50,6 +53,11 @@ void setup()
   if (sensor.begin() == true) // Function to check if the sensor will correctly self-identify with the proper Device ID/Address
   {
     Serial1.println("Begin");
+    for (int i = 0; i < 10; i++)
+    {
+      regdata = sensor.readRegister(regmap[i]);
+      sprintf(outline, "Register %X: %X",regmap[i], regdata);
+    }    
   }
   else
   {
