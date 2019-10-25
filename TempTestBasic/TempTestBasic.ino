@@ -43,6 +43,8 @@ TMP117 sensor; // Initalize sensor
 void setup()
 {
   Wire.begin();
+  Serial1.setTX(26);
+  Serial1.setRX(27);
   Serial1.begin(115200,SERIAL_8N1);    // Start serial communication at 115200 baud
   Wire.setClock(400000);   // Set clock speed to be the fastest for better communication (fast mode)
 
@@ -50,6 +52,7 @@ void setup()
   if (sensor.begin() == true) // Function to check if the sensor will correctly self-identify with the proper Device ID/Address
   {
     Serial1.println("Begin");
+    sensor.setContinuousConversionMode();
   }
   else
   {
@@ -61,6 +64,7 @@ void setup()
 void loop()
 {
   // Data Ready is a flag for the conversion modes - in continous conversion the dataReady flag should always be high
+  //Serial1.println("Starting loop");
   if (sensor.dataReady() == true) // Function to make sure that there is data ready to be printed, only prints temperature values when data is ready
   {
     float tempC = sensor.readTempC();
