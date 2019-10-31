@@ -24,9 +24,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include "ADIS16209.h"
-#include <SPI.h>
-//#include <spi4teensy3.h>
-//SPISettings SPIset(1000000, MSBFIRST, SPI_MODE3);
 
 ////////////////////////////////////////////////////////////////////////////
 // Constructor with configurable CS, DR, and RST
@@ -35,21 +32,21 @@
 // DR - DR output pin for data ready
 // RST - Hardware reset pin
 ////////////////////////////////////////////////////////////////////////////
-ADIS16209::ADIS16209(int CS, int DR, int RST) {
+ADIS16209::ADIS16209(int CS,  SPIClass &spiPort, SPISettings &SPIset) {
   _CS = CS;
-  _DR = DR;
-  _RST = RST;
 
+  _spiPort = &spiPort;
+  _spiSet = &SPIset;
 
-  SPI.begin(); // Initialize SPI bus
-  configSPI(); // Configure SPI
+  //SPI.begin(); // Initialize SPI bus
+  //configSPI(); // Configure SPI
 
 //Set default pin states
   pinMode(_CS, OUTPUT); // Set CS pin to be an output
-  pinMode(_DR, INPUT); // Set DR pin to be an input
-  pinMode(_RST, OUTPUT); // Set RST pin to be an output
+//  pinMode(_DR, INPUT); // Set DR pin to be an input
+//  pinMode(_RST, OUTPUT); // Set RST pin to be an output
   digitalWrite(_CS, HIGH); // Initialize CS pin to be high
-  digitalWrite(_RST, HIGH); // Initialize RST pin to be high
+//  digitalWrite(_RST, HIGH); // Initialize RST pin to be high
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -57,12 +54,13 @@ ADIS16209::ADIS16209(int CS, int DR, int RST) {
 ////////////////////////////////////////////////////////////////////////////
 ADIS16209::~ADIS16209() {
   // Close SPI bus
-  SPI.end();
+  //SPI.end();
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Performs a hardware reset by setting _RST pin low for delay (in ms).
 ////////////////////////////////////////////////////////////////////////////
+/*
 int ADIS16209::resetDUT(uint8_t ms) {
   digitalWrite(_RST, LOW);
   delay(100);
@@ -70,21 +68,20 @@ int ADIS16209::resetDUT(uint8_t ms) {
   delay(ms);
   return(1);
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////
 // Sets SPI bit order, clock divider, and data mode. This function is useful
 // when there are multiple SPI devices using different settings.
 // Returns 1 when complete.
 ////////////////////////////////////////////////////////////////////////////
-int ADIS16209::configSPI() {
-  /*
+/*int ADIS16209::configSPI() {
   SPI.setBitOrder(MSBFIRST); // Per the datasheet
   SPI.setClockDivider(SPI_CLOCK_DIV16); // Config for 1MHz
   SPI.setDataMode(SPI_MODE3); // Clock base at one, sampled on falling edge
-  */
-  //SPIset = SPISettings(1000000, MSBFIRST, SPI_MODE3);
   return(1);
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Reads two bytes (one word) in two sequential registers over SPI
@@ -92,29 +89,31 @@ int ADIS16209::configSPI() {
 // regAddr - address of register to be read
 // return - (int) signed 16 bit 2's complement number
 ////////////////////////////////////////////////////////////////////////////////////////////
-int16_t ADIS16209::regRead(uint8_t regAddr) {
+uint16_t ADIS16209::readRegister(uint8_t regAddr) {
 //Read registers using SPI
   
   // Write register address to be read
-  SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE3));
+  _spiPort->beginTransaction(*_spiSet);
   digitalWrite(_CS, LOW); // Set CS low to enable device
-  SPI.transfer(regAddr); // Write address over SPI bus
-  SPI.transfer(0x00); // Write 0x00 to the SPI bus fill the 16 bit transaction requirement
+  delayMicroseconds(1);
+  _spiPort->transfer(regAddr); // Write address over SPI bus
+  _spiPort->transfer(0x00); // Write 0x00 to the SPI bus fill the 16 bit transaction requirement
   digitalWrite(_CS, HIGH); // Set CS high to disable device
 
   delayMicroseconds(25); // Delay to not violate read rate (40us)
 
   // Read data from requested register
   digitalWrite(_CS, LOW); // Set CS low to enable device
-  uint8_t _msbData = SPI.transfer(0x00); // Send (0x00) and place upper byte into variable
-  uint8_t _lsbData = SPI.transfer(0x00); // Send (0x00) and place lower byte into variable
+  delayMicroseconds(1);
+  uint8_t _msbData = _spiPort->transfer(0x00); // Send (0x00) and place upper byte into variable
+  uint8_t _lsbData = _spiPort->transfer(0x00); // Send (0x00) and place lower byte into variable
   digitalWrite(_CS, HIGH); // Set CS high to disable device
-
+  _spiPort->endTransaction();
   delayMicroseconds(25); // Delay to not violate read rate (40us)
   
   // Shift MSB data left by 8 bits, mask LSB data with 0xFF, and OR both bits
   uint16_t _dataOut = (_msbData << 8) | (_lsbData & 0xFF); // Concatenate upper and lower bytes
-  SPI.endTransaction();
+  
   return(_dataOut);
 }
 
@@ -125,7 +124,7 @@ int16_t ADIS16209::regRead(uint8_t regAddr) {
 // regAddr - address of register to be written
 // regData - data to be written to the register
 ////////////////////////////////////////////////////////////////////////////
-int ADIS16209::regWrite(uint8_t regAddr, int16_t regData) {
+int ADIS16209::writeRegister(uint8_t regAddr, int16_t regData) {
 
   // Write register address and data
   uint16_t addr = (((regAddr & 0x7F) | 0x80) << 8); // Toggle sign bit, and check that the address is 8 bits
@@ -139,28 +138,30 @@ int ADIS16209::regWrite(uint8_t regAddr, int16_t regData) {
   uint8_t lowBytelowWord = (lowWord & 0xFF);
 
   // Write highWord to SPI bus
-  SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE3));
+  _spiPort->beginTransaction(*_spiSet);
   digitalWrite(_CS, LOW); // Set CS low to enable device
-  SPI.transfer(highBytehighWord); // Write high byte from high word to SPI bus
-  SPI.transfer(lowBytehighWord); // Write low byte from high word to SPI bus
+  delayMicroseconds(1); // Require setup time between CS Low and first clock edge
+  _spiPort->transfer(highBytehighWord); // Write high byte from high word to SPI bus
+  _spiPort->transfer(lowBytehighWord); // Write low byte from high word to SPI bus
   digitalWrite(_CS, HIGH); // Set CS high to disable device
 
   delayMicroseconds(40); // Delay to not violate read rate (40us)
 
   // Write lowWord to SPI bus
   digitalWrite(_CS, LOW); // Set CS low to enable device
-  SPI.transfer(highBytelowWord); // Write high byte from low word to SPI bus
-  SPI.transfer(lowBytelowWord); // Write low byte from low word to SPI bus
+  delayMicroseconds(1);
+  _spiPort->transfer(highBytelowWord); // Write high byte from low word to SPI bus
+  _spiPort->transfer(lowBytelowWord); // Write low byte from low word to SPI bus
   digitalWrite(_CS, HIGH); // Set CS high to disable device
-  SPI.endTransaction();
+  _spiPort->endTransaction();
   return(1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
-// Converts accelerometer data output from the regRead() function and returns
+// Converts accelerometer data output from the readRegister() function and returns
 // acceleration in mg's
 /////////////////////////////////////////////////////////////////////////////////////////
-// sensorData - data output from regRead()
+// sensorData - data output from readRegister()
 // return - (float) signed/scaled accelerometer in mg's
 /////////////////////////////////////////////////////////////////////////////////////////
 float ADIS16209::accelScale(int16_t sensorData)
@@ -177,10 +178,10 @@ float ADIS16209::accelScale(int16_t sensorData)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// Converts incline angle data output from the regRead() function and returns incline angle
+// Converts incline angle data output from the readRegister() function and returns incline angle
 // in degrees
 /////////////////////////////////////////////////////////////////////////////////////////////
-// sensorData - data output from regRead()
+// sensorData - data output from readRegister()
 // return - (float) signed/scaled incline or rotation in degrees
 /////////////////////////////////////////////////////////////////////////////////////////
 float ADIS16209::inclineScale(int16_t sensorData)
@@ -197,10 +198,10 @@ float ADIS16209::inclineScale(int16_t sensorData)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// Converts temperature data output from the regRead() function and returns temperature 
+// Converts temperature data output from the readRegister() function and returns temperature 
 // in degrees Celcius
 /////////////////////////////////////////////////////////////////////////////////////////////
-// sensorData - data output from regRead()
+// sensorData - data output from readRegister()
 // return - (float) signed/scaled temperature in degrees Celcius
 /////////////////////////////////////////////////////////////////////////////////////////
 float ADIS16209::tempScale(int16_t sensorData)
@@ -211,10 +212,10 @@ float ADIS16209::tempScale(int16_t sensorData)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-// Converts voltage supply data output from the regRead() function and returns voltage 
+// Converts voltage supply data output from the readRegister() function and returns voltage 
 // in volts.
 /////////////////////////////////////////////////////////////////////////////////////////////
-// sensorData - data output from regRead()
+// sensorData - data output from readRegister()
 // return - (float) signed/scaled voltage in Volts
 /////////////////////////////////////////////////////////////////////////////////////////
 float ADIS16209::supplyScale(int16_t sensorData)

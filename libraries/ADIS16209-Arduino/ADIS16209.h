@@ -1,4 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  October 2019
+//  Author: Jacob Bernstein
+//  Notes: Modifications to the 
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  October 2015
 //  Author: Juan Jose Chong <juan.chong@analog.com>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,7 +32,6 @@
 #define ADIS16209_h
 #include "Arduino.h"
 #include <SPI.h>
-//#include <spi4teensy3.h>
 
 // User Register Memory Map from Table 6
 #define ENDURANCE 0x00  //Flash memory write count
@@ -63,23 +67,23 @@
 class ADIS16209{
 
 public:
-  // ADIS16209 Constructor (ChipSelect, DataReady, Reset Pins)
-  ADIS16209(int CS, int DR, int RST);
+  // ADIS16209 Constructor (ChipSelect, SPI Port)
+  ADIS16209(int CS, SPIClass &spiPort, SPISettings &SPIset);
 
   // Destructor
   ~ADIS16209();
 
   // Performs hardware reset. Delay in miliseconds. Returns 1 when complete.
-  int resetDUT(uint8_t ms);
+  //int resetDUT(uint8_t ms);
 
   // Sets SPI bit order, clock divider, and data mode. Returns 1 when complete.
-  int configSPI();
+  //int configSPI();
 
   // Reads register (two bytes) Returns signed 16 bit data.
-  int16_t regRead(uint8_t regAddr);
+  uint16_t readRegister(uint8_t regAddr);
 
   // Write register (two bytes). Returns 1 when complete.
-  int regWrite(uint8_t regAddr, int16_t regData);
+  int writeRegister(uint8_t regAddr, int16_t regData);
 
   // Scale accelerometer data. Returns scaled data as float.
   float accelScale(int16_t sensorData);
@@ -97,8 +101,11 @@ public:
 private:
   //Variables to store hardware pin assignments.
   int _CS;
-  int _DR;
-  int _RST;
+  //int _DR;
+  //int _RST;
+
+  SPIClass *_spiPort = NULL;
+  SPISettings *_spiSet = NULL;
 
 };
 
