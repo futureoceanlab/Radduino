@@ -35,8 +35,9 @@
 */
 
 //#include <Wire.h>            // Used to establish serial communication on the I2C bus
-#include <i2c_t3.h>
-#include <SparkFun_TMP117.h> // Used to send and recieve specific information from our sensor
+#include <Arduino.h>
+#include "i2c_t3.h"
+#include "SparkFun_TMP117.h" // Used to send and recieve specific information from our sensor
 
 // The default address of the device is 0x48 = (GND)
 TMP117 sensor; // Initalize sensor

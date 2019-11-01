@@ -79,7 +79,7 @@ public:
   bool begin();
   uint16_t readRegister(uint8_t regAddr);                   // Reads register (two bytes) Returns signed 16 bit data.
   int writeRegister(uint8_t regAddr, uint16_t regData);      // Write register (two bytes). Returns 1 when complete.
-  int16_t sensorTransfer(uint8_t nextTransferReg);
+  uint16_t sensorTransfer(uint8_t nextTransferReg);
   float accelScale(int16_t sensorData);                     // Scale accelerometer data. Returns scaled data as float.
   float inclineScale(int16_t sensorData);                   // Scale incline data. Returns scaled data as float.
   float tempScale(int16_t sensorData);                      // Scale temperature data. Returns scaled data as float.
@@ -107,8 +107,8 @@ private:
   //int _RST;
 
   SPIClass *_spiPort = NULL;
-  SPISettings _slowSPI(1000000, MSBFIRST, SPI_MODE3);
-  SPISettings _fastSPI(2500000, MSBFIRST, SPI_MODE3);
+  SPISettings _slowSPI = SPISettings(1000000, MSBFIRST, SPI_MODE3);
+  SPISettings _fastSPI = SPISettings(2500000, MSBFIRST, SPI_MODE3);
   SPISettings *_spiSet;
 };
 

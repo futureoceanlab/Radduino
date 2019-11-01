@@ -97,7 +97,7 @@ private:
 	//TwoWire *_i2cPort = NULL; //The generic connection to user's chosen I2C hardware
 	i2c_t3 *_i2cPort = NULL;
 	uint8_t _deviceAddress;   // Address of Temperature sensor
-	uint8_t _regPointer = NULL;
+	uint8_t _regPointer = 0xFF;
 };
 
 #endif

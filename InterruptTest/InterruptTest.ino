@@ -1,6 +1,6 @@
 
 #define INTERRUPTPIN 38
-#define READCOUNTDELAYMICROS 250
+#define READCOUNTDELAYMICROS 500
 #define SENSORREADPERIODMILLIS 100
 #define HEARTBEATPERIODMILLIS 1000
 
@@ -12,8 +12,8 @@
 #define SERIALBAUD 115200
 const int _CS=31;
 const int _SCK= 32;
-const int _MISO= 0;
-const int _MOSI= 1;
+const int _MISO= 1;
+const int _MOSI= 0;
 
 volatile int numFPGAreads = 0;
 int numI2Creads = 0;
@@ -53,7 +53,7 @@ void setup() {
   SPI1.setSCK(_SCK);
   SPI1.begin();
   if (tiltsensor.begin() == true) {
-    tiltsensor.sensorTransfer(TILT_ID_REGISTER);
+    uint16_t id = tiltsensor.sensorTransfer(TILT_ID_REGISTER);
     Serial1.println("ADIS16209 Tilt Sensor ready to go");
   }
 
@@ -99,10 +99,12 @@ void checkI2C() {
 
 void checkSPI() {
   //Serial1.println("Start SPI check");
-  int16_t id = tiltsensor.sensorTransfer(TILT_ID_REGISTER);
+  char outline[100];
+  uint16_t id = tiltsensor.sensorTransfer(TILT_ID_REGISTER);
   if (id != TILT_ID_VALUE) {
     numSPIfails++;
-    Serial1.println("SPI Register Read Failed");
+    sprintf(outline,"SPI Register Read Failed, expected %X, got %X",TILT_ID_VALUE, id);
+    Serial1.println(outline);
   }
   numSPIreads++;
   //Serial1.println("SPI check finished");
