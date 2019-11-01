@@ -166,14 +166,7 @@ int ADIS16209::writeRegister(uint8_t regAddr, int16_t regData) {
 /////////////////////////////////////////////////////////////////////////////////////////
 float ADIS16209::accelScale(int16_t sensorData)
 {
-  int signedData = 0;
-  sensorData = sensorData & 0x3FFF; // Discard upper two bits
-  int isNeg = sensorData & 0x2000;
-  if (isNeg == 0x2000) // If the number is negative, scale and sign the output
-    signedData = sensorData - 0x3FFF;
-  else
-    signedData = sensorData;
-  float finalData = signedData * 0.24414; // Multiply by accel sensitivity (244.14 uG/LSB)
+  float finalData = sensorData * SCALE_ACCEL; // Multiply by accel sensitivity (244.14 uG/LSB)
   return finalData;
 }
 
@@ -186,14 +179,7 @@ float ADIS16209::accelScale(int16_t sensorData)
 /////////////////////////////////////////////////////////////////////////////////////////
 float ADIS16209::inclineScale(int16_t sensorData)
 {
-  int signedData = 0;
-  sensorData = sensorData & 0x3FFF; // Discard upper two bits
-  int isNeg = sensorData & 0x2000;
-  if (isNeg == 0x2000) // If the number is negative, scale and sign the output
-    signedData = sensorData - 0x3FFF;
-  else
-    signedData = sensorData;
-  float finalData = signedData * 0.025; // Multiply by (0.025 degrees/LSB)
+  float finalData = sensorData * SCALE_ANGLE; // Multiply by (0.025 degrees/LSB)
   return finalData;
 }
 
@@ -204,7 +190,7 @@ float ADIS16209::inclineScale(int16_t sensorData)
 // sensorData - data output from readRegister()
 // return - (float) signed/scaled temperature in degrees Celcius
 /////////////////////////////////////////////////////////////////////////////////////////
-float ADIS16209::tempScale(int16_t sensorData)
+float ADIS16209::tempScale(uint16_t sensorData)
 {
   sensorData = sensorData & 0x0FFF; // Discard upper two bits
   float finalData = (((sensorData - 1278) * -0.47) + 25); // Multiply by temperature scale. 25C = 0x04FE
@@ -224,3 +210,87 @@ float ADIS16209::supplyScale(int16_t sensorData)
   float finalData = sensorData * 0.000305176; // Multiply by 0.000305176 Volts/LSB)
   return finalData;
 }
+
+int16_t getXaccelRAW(){
+  uint16_t rawDat;
+  int16_t signedDat;
+  rawDat = readRegister(XACCL_OUT);
+  signedDat = convRAWtoSigned(rawDat);
+  return signedDat;
+}
+
+int16_t getYaccelRAW(){
+  uint16_t rawDat;
+  int16_t signedDat;
+  rawDat = readRegister(YACCL_OUT);
+  signedDat = convRAWtoSigned(rawDat);
+  return signedDat;
+}
+int16_t getXinclRAW(){
+  uint16_t rawDat;
+  int16_t signedDat;
+  rawDat = readRegister(XINCL_OUT);
+  signedDat = convRAWtoSigned(rawDat);
+  return signedDat;
+}
+int16_t getYinclRAW(){
+  uint16_t rawDat;
+  int16_t signedDat;
+  rawDat = readRegister(YINCL_OUT);
+  signedDat = convRAWtoSigned(rawDat);
+  return signedDat;
+}
+int16_t getRotRAW(){
+  uint16_t rawDat;
+  int16_t signedDat;
+  rawDat = readRegister(ROT_OUT);
+  signedDat = convRAWtoSigned(rawDat);
+  return signedDat;
+}
+float getXaccel(){
+  int16_t sensorDat;
+  float meas;
+  sensorDat = getXaccelRAW();
+  means = accelScale(sensorDat);
+  return meas;
+}
+float getYaccel(){
+  int16_t sensorDat;
+  float meas;
+  sensorDat = getYaccelRAW();
+  means = accelScale(sensorDat);
+  return meas;
+}
+float getXincl(){
+  int16_t sensorDat;
+  float meas;
+  sensorDat = getXinclRAW();
+  means = inclineScale(sensorDat);
+  return meas;
+}
+float getYincl(){
+  int16_t sensorDat;
+  float meas;
+  sensorDat = getYinclRAW();
+  means = inclineScale(sensorDat);
+  return meas;
+}
+float getRot(){
+  int16_t sensorDat;
+  float meas;
+  sensorDat = getRotRAW();
+  means = inclineScale(sensorDat);
+  return meas;
+}
+
+int16_t convRAWtoSigned(uint16_t rawData) {
+  int16_t signedData;
+  rawData = rawData & 0x3FFF; // Discard upper two bits
+  signedData = (int16_t) rawData;
+  int isNeg = sensorData & 0x2000;
+  if (isNeg == 0x2000) {// If the number is negative, scale and sign the output
+    signedData -= 0x4000;
+  }
+  return signedData;
+}
+  
