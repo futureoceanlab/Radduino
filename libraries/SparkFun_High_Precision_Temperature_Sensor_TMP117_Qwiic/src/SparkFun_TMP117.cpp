@@ -74,7 +74,7 @@ bool TMP117::begin(uint8_t sensorAddress, i2c_t3 &wirePort)
 	{
 		return false;
 	}
-
+	
 	return true; //returns true if all the checks pass
 }
 
@@ -94,9 +94,12 @@ uint8_t TMP117::getAddress()
 */
 uint16_t TMP117::readRegister(uint8_t reg) // originally TMP117_Register reg
 {
-	_i2cPort->beginTransmission(_deviceAddress); // Originally cast (uint8_t)
-	_i2cPort->write(reg);
-	_i2cPort->endTransmission();					   // endTransmission but keep the connection active
+	if (reg != _regPointer) {
+		_i2cPort->beginTransmission(_deviceAddress); // Originally cast (uint8_t)
+		_i2cPort->write(reg);
+		_i2cPort->endTransmission();					   // endTransmission but keep the connection active
+		_regPointer = reg;
+	}
 	_i2cPort->requestFrom(_deviceAddress, (uint8_t)2); // Ask for 2 bytes, once done, bus is released by default
 
 	uint8_t data[2] = {0};	 // Declares an array of length 2 to be empty
@@ -120,6 +123,7 @@ void TMP117::writeRegister(uint8_t reg, uint16_t data) // originally TMP117_Regi
 	_i2cPort->write(highByte(data)); // Write MSB (D15-D8)
 	_i2cPort->write(lowByte(data));  // Write LSB (D7-D0)
 	_i2cPort->endTransmission();	 // Stop transmitting data
+	_regPointer = reg;
 }
 
 /* READ TEMPERATURE CELSIUS

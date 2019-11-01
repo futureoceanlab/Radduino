@@ -28,27 +28,36 @@ int nextbeat = 0;
 #include <SparkFun_TMP117.h>
 #include <ADIS16209.h>
 
-SPISettings SPIset(1000000, MSBFIRST, SPI_MODE3);
-
 TMP117 tempsensor;
-ADIS16209 tiltsensor(_CS, SPI1, SPIset);
+ADIS16209 tiltsensor(_CS, SPI1);
 
 void setup() {
-  Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, 400000);
-  Wire.setDefaultTimeout(200000); // 200ms
+  //Set up Serial
   Serial1.setTX(26);
   Serial1.setRX(27);
   Serial1.begin(SERIALBAUD,SERIAL_8N1);
   Serial.begin(115200);
   Serial1.println("Interrupt test doot doot");  
+
+  //Set up TMP117 Temp Sensor
+  Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, 400000);
+  Wire.setDefaultTimeout(200000); // 200ms
   //Serial.println("Interrupt test");
   if (tempsensor.begin() == true) {
-    Serial1.println("Temperature Sensor ready to go");
+    Serial1.println("TMP117 Temperature Sensor ready to go");
   }
+
+  //Set up ADIS16209 Tilt Sensor
   SPI1.setMOSI(_MOSI);
   SPI1.setMISO(_MISO);
   SPI1.setSCK(_SCK);
   SPI1.begin();
+  if (tiltsensor.begin() == true) {
+    tiltsensor.sensorTransfer(TILT_ID_REGISTER);
+    Serial1.println("ADIS16209 Tilt Sensor ready to go");
+  }
+
+  //Set up Interrupt
   attachInterrupt(digitalPinToInterrupt(INTERRUPTPIN), SimulateRead, FALLING);
 }
 
@@ -90,7 +99,7 @@ void checkI2C() {
 
 void checkSPI() {
   //Serial1.println("Start SPI check");
-  uint16_t id = tiltsensor.readRegister(TILT_ID_REGISTER);
+  int16_t id = tiltsensor.sensorTransfer(TILT_ID_REGISTER);
   if (id != TILT_ID_VALUE) {
     numSPIfails++;
     Serial1.println("SPI Register Read Failed");

@@ -83,6 +83,14 @@ int ADIS16209::resetDUT(uint8_t ms) {
 }
 */
 
+int ADIS16209::begin() {
+  _spiSet = &_slowSPI;
+  writeRegister(SMPL_PRD, 0x0007);
+  writeRegister(AVG_CNT, 0x0006);
+  _spiSet = &_fastSPI;
+  return true;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 // Reads two bytes (one word) in two sequential registers over SPI
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,7 +132,7 @@ uint16_t ADIS16209::readRegister(uint8_t regAddr) {
 // regAddr - address of register to be written
 // regData - data to be written to the register
 ////////////////////////////////////////////////////////////////////////////
-int ADIS16209::writeRegister(uint8_t regAddr, int16_t regData) {
+int ADIS16209::writeRegister(uint8_t regAddr, uint16_t regData) {
 
   // Write register address and data
   uint16_t addr = (((regAddr & 0x7F) | 0x80) << 8); // Toggle sign bit, and check that the address is 8 bits
@@ -155,6 +163,21 @@ int ADIS16209::writeRegister(uint8_t regAddr, int16_t regData) {
   digitalWrite(_CS, HIGH); // Set CS high to disable device
   _spiPort->endTransaction();
   return(1);
+}
+
+int16_t sensorTransfer(uint8_t nextTransferReg){
+  // Write register address to be read
+  _spiPort->beginTransaction(*_spiSet);
+  digitalWrite(_CS, LOW); // Set CS low to enable device
+  delayMicroseconds(1);
+  uint8_t _msbData = _spiPort->transfer(regAddr); // Write address over SPI bus
+  uint8_t _lsbData = _spiPort->transfer(0x00); // Write 0x00 to the SPI bus fill the 16 bit transaction requirement
+  digitalWrite(_CS, HIGH); // Set CS high to disable device
+  _spiPort->endTransaction();    
+  // Shift MSB data left by 8 bits, mask LSB data with 0xFF, and OR both bits
+  uint16_t _dataOut = (_msbData << 8) | (_lsbData & 0xFF); // Concatenate upper and lower bytes
+  int16_t _signedData = convRAWtoSigned(_dataOut);
+  return(_signedData);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
