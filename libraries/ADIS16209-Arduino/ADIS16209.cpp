@@ -32,11 +32,10 @@
 // DR - DR output pin for data ready
 // RST - Hardware reset pin
 ////////////////////////////////////////////////////////////////////////////
-ADIS16209::ADIS16209(int CS,  SPIClass &spiPort, SPISettings &SPIset) {
+ADIS16209::ADIS16209(int CS,  SPIClass &spiPort) {
   _CS = CS;
 
   _spiPort = &spiPort;
-  _spiSet = &SPIset;
 
   //SPI.begin(); // Initialize SPI bus
   //configSPI(); // Configure SPI
@@ -83,7 +82,7 @@ int ADIS16209::resetDUT(uint8_t ms) {
 }
 */
 
-int ADIS16209::begin() {
+bool ADIS16209::begin() {
   _spiSet = &_slowSPI;
   writeRegister(SMPL_PRD, 0x0007);
   writeRegister(AVG_CNT, 0x0006);
@@ -165,19 +164,20 @@ int ADIS16209::writeRegister(uint8_t regAddr, uint16_t regData) {
   return(1);
 }
 
-int16_t sensorTransfer(uint8_t nextTransferReg){
+uint16_t ADIS16209::sensorTransfer(uint8_t nextTransferReg){
   // Write register address to be read
   _spiPort->beginTransaction(*_spiSet);
   digitalWrite(_CS, LOW); // Set CS low to enable device
   delayMicroseconds(1);
-  uint8_t _msbData = _spiPort->transfer(regAddr); // Write address over SPI bus
+  uint8_t _msbData = _spiPort->transfer(nextTransferReg); // Write address over SPI bus
   uint8_t _lsbData = _spiPort->transfer(0x00); // Write 0x00 to the SPI bus fill the 16 bit transaction requirement
   digitalWrite(_CS, HIGH); // Set CS high to disable device
   _spiPort->endTransaction();    
   // Shift MSB data left by 8 bits, mask LSB data with 0xFF, and OR both bits
   uint16_t _dataOut = (_msbData << 8) | (_lsbData & 0xFF); // Concatenate upper and lower bytes
-  int16_t _signedData = convRAWtoSigned(_dataOut);
-  return(_signedData);
+  //int16_t _signedData = convRAWtoSigned(_dataOut);
+  //return(_signedData);
+  return(_dataOut);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +213,7 @@ float ADIS16209::inclineScale(int16_t sensorData)
 // sensorData - data output from readRegister()
 // return - (float) signed/scaled temperature in degrees Celcius
 /////////////////////////////////////////////////////////////////////////////////////////
-float ADIS16209::tempScale(uint16_t sensorData)
+float ADIS16209::tempScale(int16_t sensorData)
 {
   sensorData = sensorData & 0x0FFF; // Discard upper two bits
   float finalData = (((sensorData - 1278) * -0.47) + 25); // Multiply by temperature scale. 25C = 0x04FE
@@ -227,14 +227,14 @@ float ADIS16209::tempScale(uint16_t sensorData)
 // sensorData - data output from readRegister()
 // return - (float) signed/scaled voltage in Volts
 /////////////////////////////////////////////////////////////////////////////////////////
-float ADIS16209::supplyScale(int16_t sensorData)
+float ADIS16209::supplyScale(uint16_t sensorData)
 {
   sensorData = sensorData & 0x3FFF; // Discard upper two bits
   float finalData = sensorData * 0.000305176; // Multiply by 0.000305176 Volts/LSB)
   return finalData;
 }
 
-int16_t getXaccelRAW(){
+int16_t ADIS16209::getXaccelRAW(){
   uint16_t rawDat;
   int16_t signedDat;
   rawDat = readRegister(XACCL_OUT);
@@ -242,75 +242,75 @@ int16_t getXaccelRAW(){
   return signedDat;
 }
 
-int16_t getYaccelRAW(){
+int16_t ADIS16209::getYaccelRAW(){
   uint16_t rawDat;
   int16_t signedDat;
   rawDat = readRegister(YACCL_OUT);
   signedDat = convRAWtoSigned(rawDat);
   return signedDat;
 }
-int16_t getXinclRAW(){
+int16_t ADIS16209::getXinclRAW(){
   uint16_t rawDat;
   int16_t signedDat;
   rawDat = readRegister(XINCL_OUT);
   signedDat = convRAWtoSigned(rawDat);
   return signedDat;
 }
-int16_t getYinclRAW(){
+int16_t ADIS16209::getYinclRAW(){
   uint16_t rawDat;
   int16_t signedDat;
   rawDat = readRegister(YINCL_OUT);
   signedDat = convRAWtoSigned(rawDat);
   return signedDat;
 }
-int16_t getRotRAW(){
+int16_t ADIS16209::getRotRAW(){
   uint16_t rawDat;
   int16_t signedDat;
   rawDat = readRegister(ROT_OUT);
   signedDat = convRAWtoSigned(rawDat);
   return signedDat;
 }
-float getXaccel(){
+float ADIS16209::getXaccel(){
   int16_t sensorDat;
   float meas;
   sensorDat = getXaccelRAW();
-  means = accelScale(sensorDat);
+  meas = accelScale(sensorDat);
   return meas;
 }
-float getYaccel(){
+float ADIS16209::getYaccel(){
   int16_t sensorDat;
   float meas;
   sensorDat = getYaccelRAW();
-  means = accelScale(sensorDat);
+  meas = accelScale(sensorDat);
   return meas;
 }
-float getXincl(){
+float ADIS16209::getXincl(){
   int16_t sensorDat;
   float meas;
   sensorDat = getXinclRAW();
-  means = inclineScale(sensorDat);
+  meas = inclineScale(sensorDat);
   return meas;
 }
-float getYincl(){
+float ADIS16209::getYincl(){
   int16_t sensorDat;
   float meas;
   sensorDat = getYinclRAW();
-  means = inclineScale(sensorDat);
+  meas = inclineScale(sensorDat);
   return meas;
 }
-float getRot(){
+float ADIS16209::getRot(){
   int16_t sensorDat;
   float meas;
   sensorDat = getRotRAW();
-  means = inclineScale(sensorDat);
+  meas = inclineScale(sensorDat);
   return meas;
 }
 
-int16_t convRAWtoSigned(uint16_t rawData) {
+int16_t ADIS16209::convRAWtoSigned(uint16_t rawData) {
   int16_t signedData;
-  rawData = rawData & 0x3FFF; // Discard upper two bits
+  int isNeg = rawData & 0x2000;
+  rawData = rawData & 0x1FFF; // Discard upper three bits
   signedData = (int16_t) rawData;
-  int isNeg = sensorData & 0x2000;
   if (isNeg == 0x2000) {// If the number is negative, scale and sign the output
     signedData -= 0x4000;
   }
