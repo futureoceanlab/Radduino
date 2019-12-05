@@ -1,8 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  October 2019
 //  Author: Jacob Bernstein
-//  Notes: Modifications to the 
-//
+//  Notes: Modifications to the library by Juan Jose Chong:
+//"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  October 2015
 //  Author: Juan Jose Chong <juan.chong@analog.com>
@@ -25,7 +25,7 @@
 //
 //  You should have received a copy of the GNU Lesser Public License along with 
 //  this example.  If not, see <http://www.gnu.org/licenses/>.
-//
+//"
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef ADIS16209_h
@@ -73,13 +73,15 @@ class ADIS16209{
 
 public:
   
-  ADIS16209(int CS, SPIClass &spiPort);  // ADIS16209 Constructor (ChipSelect, SPI Port)
+  ADIS16209(int CS=31, SPIClass &spiPort = SPI1, SPISettings &SPIset = _fastSPI);  // ADIS16209 Constructor (ChipSelect, SPI Port)
   ~ADIS16209();                                               // Destructor
+  //FOL Library functions
+  bool setupSensor();
+  uint16_t transceiveSensor(uint8_t nextTransferReg);
 
-  bool begin();
+  //Original library functions
   uint16_t readRegister(uint8_t regAddr);                   // Reads register (two bytes) Returns signed 16 bit data.
   int writeRegister(uint8_t regAddr, uint16_t regData);      // Write register (two bytes). Returns 1 when complete.
-  int16_t sensorTransfer(uint8_t nextTransferReg);
   float accelScale(int16_t sensorData);                     // Scale accelerometer data. Returns scaled data as float.
   float inclineScale(int16_t sensorData);                   // Scale incline data. Returns scaled data as float.
   float tempScale(int16_t sensorData);                      // Scale temperature data. Returns scaled data as float.

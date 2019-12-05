@@ -83,12 +83,27 @@ int ADIS16209::resetDUT(uint8_t ms) {
 }
 */
 
-int ADIS16209::begin() {
+bool ADIS16209::setupSensor() {
   _spiSet = &_slowSPI;
-  writeRegister(SMPL_PRD, 0x0007);
-  writeRegister(AVG_CNT, 0x0006);
+  writeRegister(SMPL_PRD, 0x0007); //
+  writeRegister(AVG_CNT, 0x0006); //
   _spiSet = &_fastSPI;
   return true;
+}
+
+
+uint16_t ADIS16209::transceiveSensor(uint8_t nextTransferReg){
+  // Write register address to be read
+  _spiPort->beginTransaction(*_spiSet);
+  digitalWrite(_CS, LOW); // Set CS low to enable device
+  delayMicroseconds(1);
+  uint8_t _msbData = _spiPort->transfer(regAddr); // Write address over SPI bus
+  uint8_t _lsbData = _spiPort->transfer(0x00); // Write 0x00 to the SPI bus fill the 16 bit transaction requirement
+  digitalWrite(_CS, HIGH); // Set CS high to disable device
+  _spiPort->endTransaction();    
+  // Shift MSB data left by 8 bits, mask LSB data with 0xFF, and OR both bits
+  uint16_t _dataOut = (_msbData << 8) | (_lsbData & 0xFF); // Concatenate upper and lower bytes
+  return(_dataOut);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,20 +180,7 @@ int ADIS16209::writeRegister(uint8_t regAddr, uint16_t regData) {
   return(1);
 }
 
-int16_t sensorTransfer(uint8_t nextTransferReg){
-  // Write register address to be read
-  _spiPort->beginTransaction(*_spiSet);
-  digitalWrite(_CS, LOW); // Set CS low to enable device
-  delayMicroseconds(1);
-  uint8_t _msbData = _spiPort->transfer(regAddr); // Write address over SPI bus
-  uint8_t _lsbData = _spiPort->transfer(0x00); // Write 0x00 to the SPI bus fill the 16 bit transaction requirement
-  digitalWrite(_CS, HIGH); // Set CS high to disable device
-  _spiPort->endTransaction();    
-  // Shift MSB data left by 8 bits, mask LSB data with 0xFF, and OR both bits
-  uint16_t _dataOut = (_msbData << 8) | (_lsbData & 0xFF); // Concatenate upper and lower bytes
-  int16_t _signedData = convRAWtoSigned(_dataOut);
-  return(_signedData);
-}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // Converts accelerometer data output from the readRegister() function and returns

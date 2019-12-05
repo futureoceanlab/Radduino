@@ -1,13 +1,22 @@
 #include <Arduino.h>
 #include "FOL-TMP117.h"
+#include "FOL-ADIS16209.h"
 
 #define SERIALOUT Serial
 
-#define TMP117_RESOLUTION 0.0078125f
 
+
+//Defines for reading and interpreting tilt sensor
+#define _CS 31
+#define _SCK 32
+#define _MISO 0
+#define _MOSI 1
 
 TMP117 tempsensor; // Initalize sensor
+ADIS16209 tiltsensor; // Initialize tilt sensor
 
+uint16_t rawTemp, rawTilt;
+float TempC, angle;
 
 void setup() {
   // Initialize Serial
@@ -25,14 +34,38 @@ void setup() {
   }
 
   // Initialize ADIS16209 Tilt Sensor
+  if (tiltsensor.setupSensor() == true) {
+    SERIALOUT.println("ADIS16209 set up successfully");
+  }
+  else{
+    SERIALOUT.println("ADIS16209 failed to set up");
+  }
+  tiltsensor.transceiveSensor(XINCL_OUT);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  uint16_t rawTemp = tempsensor.readSensor();
-  float TempC = rawTemp * TMP117_RESOLUTION;
+  //temp sensor read
+  rawTemp = tempsensor.readSensor();
+  TempC = rawTemp * TMP117_RESOLUTION;
   SERIALOUT.print("Temperature in C: ");
   SERIALOUT.println(TempC);
   
+  //tile sensor read
+  rawTilt = tiltsensor.transceiveSensor(YINCL_OUT);
+  SERIALOUT.print("X inclination in degrees: ");
+  angle = rawTilt * SCALE_ANGLE;
+  SERIALOUT.println(angle);
+
+  rawTilt = tiltsensor.transceiveSensor(ROT_OUT);
+  SERIALOUT.print("Y inclination in degrees: ");
+  angle = rawTilt * SCALE_ANGLE;
+  SERIALOUT.println(angle);
+
+  rawTilt = tiltsensor.transceiveSensor(XINCL_OUT);
+  SERIALOUT.print("Rotation in degrees: ");
+  angle = rawTilt * SCALE_ANGLE;
+  SERIALOUT.println(angle);
+
   delay(1000);
 }
