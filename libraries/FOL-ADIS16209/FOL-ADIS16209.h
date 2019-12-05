@@ -73,7 +73,7 @@ class ADIS16209{
 
 public:
   
-  ADIS16209(int CS=31, SPIClass &spiPort = SPI1, SPISettings &SPIset = _fastSPI);  // ADIS16209 Constructor (ChipSelect, SPI Port)
+  ADIS16209(int CS=31, SPIClass &spiPort = SPI1);  // ADIS16209 Constructor (ChipSelect, SPI Port)
   ~ADIS16209();                                               // Destructor
   //FOL Library functions
   bool setupSensor();
@@ -82,23 +82,6 @@ public:
   //Original library functions
   uint16_t readRegister(uint8_t regAddr);                   // Reads register (two bytes) Returns signed 16 bit data.
   int writeRegister(uint8_t regAddr, uint16_t regData);      // Write register (two bytes). Returns 1 when complete.
-  float accelScale(int16_t sensorData);                     // Scale accelerometer data. Returns scaled data as float.
-  float inclineScale(int16_t sensorData);                   // Scale incline data. Returns scaled data as float.
-  float tempScale(int16_t sensorData);                      // Scale temperature data. Returns scaled data as float.
-  float supplyScale(uint16_t sensorData);                    // Scale VDD supply. Returns scaled data as float.
-  //int resetDUT(uint8_t ms);                               // Performs hardware reset. Delay in miliseconds. Returns 1 when complete.
-  //int configSPI();                                        // Sets SPI bit order, clock divider, and data mode. Returns 1 when complete.
-  
-  int16_t getXaccelRAW();
-  int16_t getYaccelRAW();
-  int16_t getXinclRAW();
-  int16_t getYinclRAW();
-  int16_t getRotRAW();
-  float getXaccel();
-  float getYaccel();
-  float getXincl();
-  float getYincl();
-  float getRot();
 
 private:
 
@@ -109,8 +92,8 @@ private:
   //int _RST;
 
   SPIClass *_spiPort = NULL;
-  SPISettings _slowSPI(1000000, MSBFIRST, SPI_MODE3);
-  SPISettings _fastSPI(2500000, MSBFIRST, SPI_MODE3);
+  SPISettings _slowSPI = SPISettings(1000000, MSBFIRST, SPI_MODE3);
+  SPISettings _fastSPI = SPISettings(2500000, MSBFIRST, SPI_MODE3);
   SPISettings *_spiSet;
 };
 
