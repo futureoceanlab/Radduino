@@ -40,7 +40,8 @@ void setup() {
   else{
     SERIALOUT.println("ADIS16209 failed to set up");
   }
-  tiltsensor.transceiveSensor(XINCL_OUT);
+  tiltsensor.transceiveSensor(PROD_ID);
+  delayMicroseconds(40);
 }
 
 void loop() {
@@ -51,21 +52,33 @@ void loop() {
   SERIALOUT.print("Temperature in C: ");
   SERIALOUT.println(TempC);
   
-  //tile sensor read
+  //tilt sensor read
+  rawTilt = tiltsensor.transceiveSensor(XINCL_OUT);
+  SERIALOUT.print("Product ID: ");
+  //SERIALOUT.println(angle);
+  SERIALOUT.println(rawTilt);
+  delayMicroseconds(40);
+
   rawTilt = tiltsensor.transceiveSensor(YINCL_OUT);
   SERIALOUT.print("X inclination in degrees: ");
   angle = rawTilt * SCALE_ANGLE;
-  SERIALOUT.println(angle);
+  //SERIALOUT.println(angle);
+  SERIALOUT.println(rawTilt);
+  delayMicroseconds(40);
 
   rawTilt = tiltsensor.transceiveSensor(ROT_OUT);
   SERIALOUT.print("Y inclination in degrees: ");
   angle = rawTilt * SCALE_ANGLE;
-  SERIALOUT.println(angle);
+  //SERIALOUT.println(angle);
+  SERIALOUT.println(rawTilt);
+  delayMicroseconds(40);
 
-  rawTilt = tiltsensor.transceiveSensor(XINCL_OUT);
+  rawTilt = tiltsensor.transceiveSensor(PROD_ID);
   SERIALOUT.print("Rotation in degrees: ");
   angle = rawTilt * SCALE_ANGLE;
-  SERIALOUT.println(angle);
+  //SERIALOUT.println(angle);
+  SERIALOUT.println(rawTilt);
+  delayMicroseconds(40);
 
   delay(1000);
 }
