@@ -36,8 +36,8 @@
 
 //#include <Wire.h>            // Used to establish serial communication on the I2C bus
 #include <Arduino.h>
-#include "i2c_t3.h"
-#include "SparkFun_TMP117.h" // Used to send and recieve specific information from our sensor
+//#include "i2c_t3.h"
+#include "FOL-TMP117.h" // Used to send and recieve specific information from our sensor
 
 // The default address of the device is 0x48 = (GND)
 TMP117 sensor; // Initalize sensor
@@ -47,31 +47,32 @@ char outline[100];
 void setup()
 {
   uint16_t regdata = 0;
-  //Wire.begin();
-  Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, 400000);
-  Wire.setDefaultTimeout(200000); // 200ms
-  Serial1.setTX(26);
-  Serial1.setRX(27);
-  Serial1.begin(115200,SERIAL_8N1);    // Start serial communication at 115200 baud
+  //Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, 400000);
+  //Wire.setDefaultTimeout(200000); // 200ms
+  Serial.begin(9600);
+  //Serial1.begin(115200,SERIAL_8N1);
+  //Serial1.setTX(26);
+  //Serial1.setRX(27);
+  //Serial1.begin(115200,SERIAL_8N1);    // Start serial communication at 115200 baud
   //Wire.setClock(100000);   // Set clock speed to be the fastest for better communication (fast mode)
 
-  Serial1.println("TMP117 Example 1: Basic Readings");
-  if (sensor.begin() == true) // Function to check if the sensor will correctly self-identify with the proper Device ID/Address
+  Serial.println("TMP117 Example 1: Basic Readings");
+  if (sensor.setupSensor() == true) // Function to check if the sensor will correctly self-identify with the proper Device ID/Address
   {
-    Serial1.println(sensor.dataReady());
-    Serial1.println("Begin");
-    sensor.setContinuousConversionMode();
-    Serial1.println("Starting register read");
+    Serial.println(sensor.dataReady());
+    Serial.println("Begin");
+    //sensor.setContinuousConversionMode();
+    Serial.println("Starting register read");
     for (int i = 0; i < 10; i++)
     {
       regdata = sensor.readRegister(regmap[i]);
       sprintf(outline, "Register %X: %X",regmap[i], regdata);
-      Serial1.println(outline);
+      Serial.println(outline);
     }    
   }
   else
   {
-    Serial1.println("Device failed to setup- Freezing code.");
+    Serial.println("Device failed to setup- Freezing code.");
     while (1); // Runs forever
   }
 }
@@ -86,12 +87,12 @@ void loop()
     float tempC = sensor.readTempC();
     float tempF = sensor.readTempF();
     // Print temperature in °C and °F
-    Serial1.println(); // Create a white space for easier viewing
-    Serial1.print("Temperature in Celsius: ");
-    Serial1.println(tempC);
-    Serial1.print("Temperature in Fahrenheit: ");
-    Serial1.println(tempF);
-    delay(500); // Delay added for easier readings
+    Serial.println(); // Create a white space for easier viewing
+    Serial.print("Temperature in Celsius: ");
+    Serial.println(tempC);
+    Serial.print("Temperature in Fahrenheit: ");
+    Serial.println(tempF);
+    delay(1000); // Delay added for easier readings
     
   }
 }

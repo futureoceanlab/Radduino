@@ -45,19 +45,21 @@ Distributed as-is; no warranty is given.
 */
 TMP117::TMP117()
 {
+	Wire.begin(I2C_MASTER, 0x00, I2C_PINS_18_19, I2C_PULLUP_EXT, 400000);
+	Wire.setDefaultTimeout(500);
 }
 
 // FOL Library Functions
-bool TMP117::checkSensor()
+bool TMP117::setupSensor()
 {
 	bool check = begin();
+	if (check) {
+	setContinuousConversionMode();
+	setConversionAverageMode(1);
+	setConversionCycleBit(3);
+	}
+	return check;
 }
-
-bool TMP117::initializeSensor()
-{
-
-}
-
 
 uint16_t TMP117::readSensor()
 {

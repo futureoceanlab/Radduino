@@ -71,8 +71,7 @@ class TMP117
 public:
 	TMP117(); // Constructor
 	//FOL Functions
-	bool checkSensor();
-	bool initializeSensor();
+	bool setupSensor();
 	uint16_t readSensor();
 	//SparkFun Library Functions
 	bool begin(uint8_t sensorAddress = 0x48, i2c_t3 &wirePort = Wire); // Checks for ACK over I2C, and sets the device ID of the TMP and chooses the wire port
