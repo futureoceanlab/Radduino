@@ -12,6 +12,7 @@
 #define _MISO 0
 #define _MOSI 1
 #define _BUZZ 37
+#define _KILL 38
 
 const int MEASTEMP = 1;
 const int MEASTILT = 0;
@@ -57,6 +58,7 @@ void setup() {
   }
 
 pinMode(_BUZZ, OUTPUT);
+pinMode(_KILL, INPUT);
 
 SERIALOUT.println("Press space to toggle buzzer on/off");
 
@@ -118,6 +120,11 @@ if (SERIALOUT.available() > 0) {
     }
     digitalWrite(_BUZZ, buzzstate);
   }
+}
+
+//Check for kill signal
+if (!digitalRead(_KILL)) {
+  SERIALOUT.println("Caught a kill signal");
 }
 
   delay(1000);
