@@ -9,11 +9,10 @@ import time
 class RadiometerDaemon:
     """LCM daemon for radiometer."""
 
-    def __init__(self, dev='/dev/ttyUSB1', br = 115200, prefix='RAD'):
+    def __init__(self, dev='/dev/ttyUSB0', br = 115200):
         """Define CAN and LCM interfaces, and subscribe to input."""
         self.serial = serial.Serial(dev, baudrate=br, timeout=0.1)
-        self.prefix = prefix
-        self.pkt = struct.Struct('!3H')
+        self.pkt = struct.Struct('3H')
 
         self.filename = time.strftime("Speedtest_%Y%m%d-%H.%M")
         self.f = open(self.filename, "w")
@@ -23,16 +22,18 @@ class RadiometerDaemon:
         hdr = self.serial.read(2)
         if hdr is None:
             print('tried to handle empty serial message queue')
-        elif len(hdr) == 2 and hdr[0] == int('fc', 16):
+        elif len(hdr) == 2 and hdr[1] == int('fc', 16):
             rx = self.serial.read(6)
             (u, c, d) = self.pkt.unpack(rx)
             #write the data to file here
             self.f.write("{0}\t{1}\t{2}\n".format(u, c, d))
-        elif len(hdr) == 2 and hdr[0] == int('fd', 16):
+        elif len(hdr) == 2 and hdr[1] == int('fd', 16):
             print('rx heartbeat message')
         else:
-            print("unknown header: {0:x}".format(hdr))
+            print("unknown header: {0}".format(hdr))
             self.serial.flushInput()
+        # msg = self.serial.read(8)
+        # self.f.write("{0}\t{1}\t{2}\t{3}\n".format(*self.pkt.unpack(msg)))
 
     def connect(self):
         """Connect serial to LCM and loop with epoll."""
@@ -50,9 +51,9 @@ class RadiometerDaemon:
             epoll.close()
 
 
-def main(dev="/dev/ttyUSB1", br = 115200, prefix='RAD', verbose=0):
+def main(dev="/dev/ttyUSB0", br = 115200, verbose=0):
     """Run as a daemon."""
-    bridge = RadiometerDaemon(dev, prefix)
+    bridge = RadiometerDaemon(dev)
     bridge.connect()
 
 
@@ -64,8 +65,7 @@ if __name__ == "__main__":
     P.add_argument('-V', '--version', action='version',
                    version='%(prog)s 0.0.1',
                    help='display version information and exit')
-    P.add_argument('dev', help='the serial device to use')
-    P.add_argument('-p', '--prefix', default='RAD',
-                   help='prefix to pub/sub with')
+    P.add_argument('-dev', help='the serial device to use', default="/dev/ttyUSB0")
+    P.add_argument('-br', help='the baudrate to use', default=115200)
     A = P.parse_args()
     main(**A.__dict__)
