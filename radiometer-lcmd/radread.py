@@ -15,7 +15,8 @@ class RadiometerDaemon:
         self.prefix = prefix
         self.pkt = struct.Struct('!3H')
 
-        self.subscriptions = []
+        self.filename = time.strftime("Speedtest_%Y%m%d-%H.%M")
+        self.f = open(self.filename, "w")
 
     def serial_handler(self):
         """Receive data on serial port and send on LCM."""
@@ -26,6 +27,7 @@ class RadiometerDaemon:
             rx = self.serial.read(6)
             (u, c, d) = self.pkt.unpack(rx)
             #write the data to file here
+            self.f.write("{0}\t{1}\t{2}\n".format(u, c, d))
         elif len(hdr) == 2 and hdr[0] == int('fd', 16):
             print('rx heartbeat message')
         else:
