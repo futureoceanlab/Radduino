@@ -9,9 +9,9 @@ import time
 class RadiometerDaemon:
     """LCM daemon for radiometer."""
 
-    def __init__(self, dev='/dev/ttyUSB1', prefix='RAD'):
+    def __init__(self, dev='/dev/ttyUSB1', br = 115200, prefix='RAD'):
         """Define CAN and LCM interfaces, and subscribe to input."""
-        self.serial = serial.Serial(dev, baudrate=115200, timeout=0.1)
+        self.serial = serial.Serial(dev, baudrate=br, timeout=0.1)
         self.prefix = prefix
         self.pkt = struct.Struct('!3H')
 
@@ -50,7 +50,7 @@ class RadiometerDaemon:
             epoll.close()
 
 
-def main(dev="/dev/ttyUSB1", prefix='RAD', verbose=0):
+def main(dev="/dev/ttyUSB1", br = 115200, prefix='RAD', verbose=0):
     """Run as a daemon."""
     bridge = RadiometerDaemon(dev, prefix)
     bridge.connect()
