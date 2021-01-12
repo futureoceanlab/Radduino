@@ -23,17 +23,42 @@
 */
 elapsedMicros speedstart;
 
+union Packet {
+  uint8_t bytes[4];
+  uint16_t shorts[4];
+};
+
+void speedtest(int datarate = 115200, int uinterval = 1000, int nmsgs = 1000) {
+    Serial.println("Starting serial test");
+    Serial1.begin(datarate);
+    static int nsent = 0;
+    static union Packet packet = { .shorts = {0xFC00, 0, 0, 0}};
+    static uint32_t nextsend = uinterval;
+    speedstart = 0;
+    while (nsent < nmsgs) {
+        if (speedstart >= nextsend) {
+            Serial1.write(packet.bytes,8);
+            nsent++;
+            nextsend += uinterval;
+            packet.shorts[1] = speedstart;
+            packet.shorts[3] = nsent;
+        }
+    }
+    Serial1.end();
+    Serial.println("Serial test complete");
+}
+
 void setup() {
   Serial1.setTX(26);
   Serial1.setRX(27);
   Serial.begin(9600);
-  Serial.println("Welcome to the speedtest, hit 'r' to start")
+  Serial.println("Welcome to the speedtest, hit 'r' to start");
 }
 
 void loop() {
   static char cmd='0';
   if (Serial.available()) {      // If anything comes in Serial (USB),
-    cmd = Serial.read()
+    cmd = Serial.read();
     switch (cmd) {
         case 'r':
             speedtest();
@@ -44,22 +69,3 @@ void loop() {
 
 }
 
-void speedtest(int datarate = 115200, int uinterval = 1000, int nmsgs = 1000) {
-    Serial.println("Starting serial test")
-    Serial1.begin(datarate)
-    static int nsent = 0;
-    static uint16 packet[4] = {0xFC, uinterval, 0, 0};
-    nextsend = uinterval;
-    speedstart = 0;
-    while (nsent < nmsgs) {
-        if (speedstart >= nextsend) {
-            Serial1.write(packet,8);
-            nsent++;
-            nextsend += uinterval;
-            packet[1] = speedstart;
-            packet[3] = nsent;
-        }
-    }
-    Serial1.end()
-    Serial.println("Serial test complete")
-}
