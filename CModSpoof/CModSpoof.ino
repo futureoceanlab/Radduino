@@ -33,21 +33,21 @@
 const uint16_t      Ns[]={ 1000, 2000, 4000, 8000, 10000, 16000, 25000, 40000}; // Possible sampling rates, 250MHz:
 uint32_t time_now;
 uint8_t period = 1000; //Period in microseconds
-int readPins[] = {1, 2, 3}
+int readPins[] = {1, 2, 3};
 
 void setup() {
   pinMode(OUTPIN, OUTPUT);
-  for (i=0; i<3; ++i) {
+  for (int i=0; i<3; ++i) {
     pinMode(readPins[i], INPUT);
   }
   time_now = micros();  
 }
 
 void loop() {
-  static uint16_t nsel = 0;
+  static uint16_t nsel = 0, i=0;
 
   if (micros() - time_now > period) {
-    time_now = micros()
+    time_now = micros();
     digitalWrite(OUTPIN, HIGH);
     nsel = 0;
     for (i=0; i<3; ++i) {
@@ -55,7 +55,7 @@ void loop() {
         nsel |= 1 << i;
       }
     }
-    period = Ns[nsel]
+    period = Ns[nsel];
     delayMicroseconds(10);
     digitalWrite(OUTPIN, LOW);
   }
