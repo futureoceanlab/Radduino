@@ -31,9 +31,9 @@ union Packet {
 void speedtest(int datarate = 115200, int uinterval = 1000, int nmsgs = 1000) {
     Serial.println("Starting serial test");
     Serial1.begin(datarate);
-    static int nsent = 0;
-    static union Packet packet = { .shorts = {0xFC00, 0, 0, 0}};
-    static uint32_t nextsend = uinterval;
+    int nsent = 0;
+    union Packet packet = { .shorts = {0xFC00, 0, 0, 0}};
+    uint32_t nextsend = uinterval;
     speedstart = 0;
     while (nsent < nmsgs) {
         if (speedstart >= nextsend) {
