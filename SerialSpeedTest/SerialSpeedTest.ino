@@ -28,7 +28,16 @@ union Packet {
   uint16_t shorts[4];
 };
 
-void speedtest(int datarate = 115200, int uinterval = 1000, int nmsgs = 1000) {
+uint8_t   dataheader8[12];
+uint32_t* dataheader32 = (uint32_t*)dataheader8;
+uint8_t   dataword8[2];
+uint16_t* dataword16 = (uint16_t*) dataword8;
+uint8_t   heartbeat8[24];
+uint32_t* heartbeat32 = (uint32_t*)heartbeat8;
+
+
+/*
+void speedtest(int datarate = 38400, int uinterval = 1000, int nmsgs = 1000) {
     Serial.println("Starting serial test");
     Serial1.begin(datarate);
     int nsent = 0;
@@ -47,12 +56,37 @@ void speedtest(int datarate = 115200, int uinterval = 1000, int nmsgs = 1000) {
     Serial1.end();
     Serial.println("Serial test complete");
 }
+*/
+
+void speed_data() {
+  Serial.println("Sending data packet");
+  dataheader32[0] = 0x00ff00ff;
+  dataheader32[1] = 1;
+  dataheader32[2] = 2;
+  //Serial.write(dataheader8,12);
+  Serial1.write(dataheader8,12);
+  for (int i=0; i<50; ++i) {
+    dataword16[0] = 1024+i;
+    //Serial.write(dataword8,2);
+    Serial1.write(dataword8,2);
+  }
+}
+
+void speed_hb() {
+  Serial.println("Sending heartbeat");
+  heartbeat32[0] = 0x00fe00fe;
+  Serial1.write(heartbeat8,24);
+}
 
 void setup() {
   Serial1.setTX(26);
   Serial1.setRX(27);
   Serial.begin(9600);
-  Serial.println("Welcome to the speedtest, hit 'r' to start");
+  Serial1.begin(38400);
+  delay(100);
+  Serial.println("Welcome to the speedtest");
+  Serial.println("hit 'd' to send data packet");
+  Serial.println("hit 'h' to send heartbeat");
 }
 
 void loop() {
@@ -60,12 +94,15 @@ void loop() {
   if (Serial.available()) {      // If anything comes in Serial (USB),
     cmd = Serial.read();
     switch (cmd) {
-        case 'r':
-            speedtest();
+        case 'd':
+            speed_data();
+            break;
+        case 'h':
+            speed_hb();
             break;
     }
+    //Serial.println("Completed command");
   }
 
 
 }
-
