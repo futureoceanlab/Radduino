@@ -5,37 +5,48 @@ import select
 import serial
 import struct
 import time
+import os
 
 class RadiometerDaemon:
     """LCM daemon for radiometer."""
 
-    def __init__(self, dev='/dev/ttyUSB0', br = 115200):
+    def __init__(self, dev='/dev/ttyUSB0', br = 38400, rootfolder = '~/Documents'):
         """Define CAN and LCM interfaces, and subscribe to input."""
+        print("baudrate {0} on dev {1}".format(br, dev))
         self.serial = serial.Serial(dev, baudrate=br, timeout=0.1)
-        self.hdrpkt = struct.Struct('H2L') # 2 unsigned long bytes (ISR clock cycles, LOG clock cycles)
-        self.hbpkt = struct.Struct('H5L') # 5 unsigned long bytes (UTC, Pulse count, nsHI, irradiance, end token)
-
-        self.filename_data = time.strftime("Speedtest_%Y%m%d-%H.%M_Data")
+        self.serial.flushInput()
+        self.hdrpkt = struct.Struct('=H2L') # 2 unsigned long bytes (ISR clock cycles, LOG clock cycles)
+        self.hbpkt = struct.Struct('=H5L') # 5 unsigned long bytes (UTC, Pulse count, nsHI, irradiance, end token)
+        self.startfolder = os.getcwd()
+        foldername = os.path.join(os.path.expanduser(rootfolder),time.strftime("Speedtest_%Y.%m.%d-%H.%M"))
+        os.mkdir(foldername)
+        os.chdir(foldername)
+        self.filename_data = time.strftime("Speedtest_Data.txt")
         self.f = open(self.filename_data, "w")
-        self.filename_profiler = time.strftime("Speedtest_%Y%m%d-%H.%M_Profiler")
+        self.filename_profiler = time.strftime("Speedtest_Profiler.txt")
         self.fp = open(self.filename_profiler, "w")
 
     def serial_handler(self):
         """Receive data on serial port and send on LCM."""
         hdr = self.serial.read(2)
+        #print(hdr.hex())
         if hdr is None:
             print('tried to handle empty serial message queue')
         elif len(hdr) == 2 and int.from_bytes(hdr,"little") == 0xFF: # header
+            print('data header')
             rx = self.serial.read(10)
+            #print(rx.hex())
             (h, ISR, LOG) = self.hdrpkt.unpack(rx)
+            print("ISR: {0}, LOG: {1}".format(ISR,LOG))
             #write the data to file here
             self.fp.write("{0}\t{1}\n".format(ISR, LOG))
+            #print('finished writing to file')
         elif len(hdr) == 2 and int.from_bytes(hdr,"little") == 0xFE: # heartbeat
             rx = self.serial.read(22)
             print('rx heartbeat message')
         else:
-            dat = int.from_bytes(hdr,"little")
-            self.f.write(dat)
+            self.f.write(hdr.hex())
+            #self.f.write(hdr)
         # msg = self.serial.read(8)
         # self.f.write("{0}\t{1}\t{2}\t{3}\n".format(*self.pkt.unpack(msg)))
 
@@ -55,7 +66,7 @@ class RadiometerDaemon:
             epoll.close()
 
 
-def main(dev="/dev/ttyUSB0", br = 115200, verbose=0):
+def main(dev="/dev/ttyUSB0", br = 38400, verbose=0):
     """Run as a daemon."""
     bridge = RadiometerDaemon(dev)
     bridge.connect()
@@ -70,6 +81,6 @@ if __name__ == "__main__":
                    version='%(prog)s 0.0.1',
                    help='display version information and exit')
     P.add_argument('-dev', help='the serial device to use', default="/dev/ttyUSB0")
-    P.add_argument('-br', help='the baudrate to use', default=115200)
+    P.add_argument('-br', help='the baudrate to use', default=38400)
     A = P.parse_args()
     main(**A.__dict__)
