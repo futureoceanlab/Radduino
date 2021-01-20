@@ -30,17 +30,24 @@
 
 #define OUTPIN 0
 
-const uint16_t      Ns[]={ 1000, 2000, 4000, 8000, 10000, 16000, 25000, 40000}; // Possible sampling rates, 250MHz:
+const int      Ns[8]={ 1000, 2000, 4000, 8000, 10000, 16000, 25000, 40000}; // Possible sampling rates, 250MHz:
 uint32_t time_now;
-uint8_t period = 1000; //Period in microseconds
-int readPins[] = {1, 2, 3};
+int period = 1000, oldperiod = 0; //Period in microseconds
+int readPins[3] = {1, 2, 3};
+int pinvals[3] = {0};
+char perstring[50];
 
 void setup() {
   pinMode(OUTPIN, OUTPUT);
   for (int i=0; i<3; ++i) {
     pinMode(readPins[i], INPUT);
   }
-  time_now = micros();  
+  time_now = micros();
+  while(!Serial){
+    delay(1);
+  }
+  Serial.begin(1200);
+  Serial.println("Starting up CMod Spoofer");
 }
 
 void loop() {
@@ -51,12 +58,16 @@ void loop() {
     digitalWrite(OUTPIN, HIGH);
     nsel = 0;
     for (i=0; i<3; ++i) {
-      if (digitalRead(readPins[i]) == HIGH) {
-        nsel |= 1 << i;
-      }
+      pinvals[i] = digitalRead(readPins[i]);
     }
-    period = Ns[nsel];
-    delayMicroseconds(10);
+    nsel = pinvals[0] + (pinvals[1] << 1) + (pinvals[2] << 2);
+    period = 1000000 / Ns[nsel];
+    //if (true) {
+    if (period != oldperiod) {
+      sprintf(perstring, "New nsel: %d, freq: %d, period: %d", nsel, Ns[nsel], period);
+      Serial.println(perstring);
+      oldperiod = period;
+    }
     digitalWrite(OUTPIN, LOW);
   }
 }
