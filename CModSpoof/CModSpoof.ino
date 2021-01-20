@@ -43,9 +43,10 @@ void setup() {
     pinMode(readPins[i], INPUT);
   }
   time_now = micros();
-  while(!Serial){
-    delay(1);
-  }
+  // while(!Serial){
+  //   delay(1);
+  // }
+  delay(5000);
   Serial.begin(1200);
   Serial.println("Starting up CMod Spoofer");
 }
