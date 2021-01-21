@@ -21,10 +21,12 @@ class RadiometerDaemon:
         foldername = os.path.join(os.path.expanduser(rootfolder),time.strftime("Speedtest_%Y.%m.%d-%H.%M"))
         os.mkdir(foldername)
         os.chdir(foldername)
-        self.filename_data = time.strftime("Speedtest_Data.txt")
-        self.f = open(self.filename_data, "w")
-        self.filename_profiler = time.strftime("Speedtest_Profiler.txt")
+        self.filename_data = "Speedtest_Data.bin"
+        self.f = open(self.filename_data, "wb")
+        self.filename_profiler = "Speedtest_Profiler.txt"
         self.fp = open(self.filename_profiler, "w")
+        self.filename_heartbeat = "Speedtest_Heartbeat.txt"
+        self.fh = open(self.filename_heartbeat,"w")
 
     def serial_handler(self):
         """Receive data on serial port and send on LCM."""
@@ -33,20 +35,22 @@ class RadiometerDaemon:
         if hdr is None:
             print('tried to handle empty serial message queue')
         elif len(hdr) == 2 and int.from_bytes(hdr,"little") == 0xFF: # header
-            print('data header')
+            #print('data header')
             rx = self.serial.read(10)
             #print(rx.hex())
             (h, ISR, LOG) = self.hdrpkt.unpack(rx)
-            print("ISR: {0}, LOG: {1}".format(ISR,LOG))
+            #print("ISR: {0}, LOG: {1}".format(ISR,LOG))
             #write the data to file here
             self.fp.write("{0}\t{1}\n".format(ISR, LOG))
             #print('finished writing to file')
         elif len(hdr) == 2 and int.from_bytes(hdr,"little") == 0xFE: # heartbeat
             rx = self.serial.read(22)
+            hbval = self.hbpkt.unpack(rx)
+            self.fh.write("{0}\n".format(hbval))
             print('rx heartbeat message')
         else:
-            self.f.write(hdr.hex())
-            #self.f.write(hdr)
+            #self.f.write(hdr.hex())
+            self.f.write(hdr)
         # msg = self.serial.read(8)
         # self.f.write("{0}\t{1}\t{2}\t{3}\n".format(*self.pkt.unpack(msg)))
 
@@ -64,6 +68,9 @@ class RadiometerDaemon:
         finally:
             epoll.unregister(self.serial.fileno())
             epoll.close()
+            self.f.close()
+            self.fp.close()
+            self.fh.close()
 
 
 def main(dev="/dev/ttyUSB0", br = 38400, verbose=0):
