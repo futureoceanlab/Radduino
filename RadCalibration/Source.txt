@@ -1,0 +1,2 @@
+C:\Program Files (x86)\IVI Foundation\VISA\WinNT\TLPM
+C:\Program Files (x86)\IVI Foundation\VISA\WinNT\TLPM\Example\Python
