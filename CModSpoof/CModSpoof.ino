@@ -46,9 +46,11 @@ void setup() {
   // while(!Serial){
   //   delay(1);
   // }
+  /*
   delay(5000);
   Serial.begin(1200);
   Serial.println("Starting up CMod Spoofer");
+  */
 }
 
 void loop() {
