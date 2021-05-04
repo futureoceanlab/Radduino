@@ -1,11 +1,13 @@
 from datetime import datetime
-from ctypes import cdll,c_long, c_ulong, c_uint16, c_uint32,byref,create_string_buffer,c_bool,c_char_p,c_int,c_int16,c_double, sizeof, c_voidp
+from ctypes import cdll,c_long, c_ulong, c_uint32,byref,create_string_buffer,c_bool,c_char_p,c_int,c_int16,c_double, sizeof, c_voidp
+from PM100D import TLPM as PM100D
 from TLPM import TLPM
 import time
 import os
 
 #os.add_dll_directory(os.path.dirname(os.path.realpath(__file__)))
 tlPM = TLPM()
+tlPM = PM100D()
 deviceCount = c_uint32()
 tlPM.findRsrc(byref(deviceCount))
 
@@ -19,7 +21,7 @@ for i in range(0, deviceCount.value):
 
 tlPM.close()
 
-tlPM = TLPM()
+tlPM = PM100D()
 #resourceName = create_string_buffer(b"COM1::115200")
 #print(c_char_p(resourceName.raw).value)
 tlPM.open(resourceName, c_bool(True), c_bool(True))
@@ -30,19 +32,6 @@ print(c_char_p(message.raw).value)
 
 time.sleep(0.5)
 
-#print(tlPM.setAvgTime(c_double(0.1)))
-print(tlPM.setAvgCnt(c_int16(32)))
-avgcnt = c_int16(0)
-tlPM.getAvgCnt(byref(avgcnt))
-print(avgcnt.value)
-wavelength = c_double(470)
-print(wavelength.value)
-print(tlPM.setWavelength(wavelength))
-print(tlPM.setWavelength(c_double(470.)))
-time.sleep(0.1)
-tlPM.getWavelength(c_uint16(0),byref(wavelength))
-time.sleep(0.1)
-print(wavelength.value)
 power_measurements = []
 times = []
 count = 0

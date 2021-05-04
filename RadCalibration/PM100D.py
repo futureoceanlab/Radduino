@@ -6,9 +6,9 @@ class TLPM:
 
 	def __init__(self):
 		if sizeof(c_voidp) == 4:
-			self.dll = cdll.LoadLibrary("TLPM_32.dll")
+			self.dll = cdll.LoadLibrary("PM100D_32.dll")
 		else:
-			self.dll = cdll.LoadLibrary("TLPM_64.dll")
+			self.dll = cdll.LoadLibrary("PM100D_64.dll")
 
 		self.devSession = c_long()
 		self.devSession.value = 0
@@ -20,7 +20,7 @@ class TLPM:
 
 	def __throwError(self, code):
 		msg = create_string_buffer(1024)
-		self.dll.TLPM_errorMessage(self.devSession, c_int(code), msg)
+		self.dll.PM100D_errorMessage(self.devSession, c_int(code), msg)
 		raise NameError(c_char_p(msg.raw).value)
 
 	def open(self, resourceName, IDQuery, resetDevice):
@@ -68,9 +68,9 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		self.dll.TLPM_close(self.devSession)
+		self.dll.PM100D_close(self.devSession)
 		self.devSession.value = 0
-		pInvokeResult = self.dll.TLPM_init(resourceName, IDQuery, resetDevice, byref(self.devSession))
+		pInvokeResult = self.dll.PM100D_init(resourceName, IDQuery, resetDevice, byref(self.devSession))
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -85,7 +85,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_close(self.devSession)
+		pInvokeResult = self.dll.PM100D_close(self.devSession)
 		return pInvokeResult
 
 	def findRsrc(self, resourceCount):
@@ -107,7 +107,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_findRsrc(self.devSession, resourceCount)
+		pInvokeResult = self.dll.PM100D_findRsrc(self.devSession, resourceCount)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -141,7 +141,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getRsrcName(self.devSession, index, resourceName)
+		pInvokeResult = self.dll.PM100D_getRsrcName(self.devSession, index, resourceName)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -212,7 +212,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getRsrcInfo(self.devSession, index, modelName, serialNumber, manufacturer, deviceAvailable)
+		pInvokeResult = self.dll.PM100D_getRsrcInfo(self.devSession, index, modelName, serialNumber, manufacturer, deviceAvailable)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -450,7 +450,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_writeRegister(self.devSession, reg, value)
+		pInvokeResult = self.dll.PM100D_writeRegister(self.devSession, reg, value)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -708,7 +708,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_readRegister(self.devSession, reg, value)
+		pInvokeResult = self.dll.PM100D_readRegister(self.devSession, reg, value)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -720,7 +720,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_presetRegister(self.devSession)
+		pInvokeResult = self.dll.PM100D_presetRegister(self.devSession)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -754,7 +754,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setTime(self.devSession, year, month, day, hour, minute, second)
+		pInvokeResult = self.dll.PM100D_setTime(self.devSession, year, month, day, hour, minute, second)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -780,7 +780,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getTime(self.devSession, year, month, day, hour, minute, second)
+		pInvokeResult = self.dll.PM100D_getTime(self.devSession, year, month, day, hour, minute, second)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -813,7 +813,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setLineFrequency(self.devSession, lineFrequency)
+		pInvokeResult = self.dll.PM100D_setLineFrequency(self.devSession, lineFrequency)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -834,7 +834,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getLineFrequency(self.devSession, lineFrequency)
+		pInvokeResult = self.dll.PM100D_getLineFrequency(self.devSession, lineFrequency)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -857,7 +857,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getBatteryVoltage(self.devSession, voltage)
+		pInvokeResult = self.dll.PM100D_getBatteryVoltage(self.devSession, voltage)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -878,7 +878,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setDispBrightness(self.devSession, val)
+		pInvokeResult = self.dll.PM100D_setDispBrightness(self.devSession, val)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -893,7 +893,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getDispBrightness(self.devSession, pVal)
+		pInvokeResult = self.dll.PM100D_getDispBrightness(self.devSession, pVal)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -918,7 +918,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setDispContrast(self.devSession, val)
+		pInvokeResult = self.dll.PM100D_setDispContrast(self.devSession, val)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -935,7 +935,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getDispContrast(self.devSession, pVal)
+		pInvokeResult = self.dll.PM100D_getDispContrast(self.devSession, pVal)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -964,7 +964,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setInputFilterState(self.devSession, inputFilterState)
+		pInvokeResult = self.dll.PM100D_setInputFilterState(self.devSession, inputFilterState)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -995,7 +995,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getInputFilterState(self.devSession, inputFilterState)
+		pInvokeResult = self.dll.PM100D_getInputFilterState(self.devSession, inputFilterState)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1026,7 +1026,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setAccelState(self.devSession, accelState)
+		pInvokeResult = self.dll.PM100D_setAccelState(self.devSession, accelState)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1057,7 +1057,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getAccelState(self.devSession, accelState)
+		pInvokeResult = self.dll.PM100D_getAccelState(self.devSession, accelState)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1096,7 +1096,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setAccelMode(self.devSession, accelMode)
+		pInvokeResult = self.dll.PM100D_setAccelMode(self.devSession, accelMode)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1127,7 +1127,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getAccelMode(self.devSession, accelMode)
+		pInvokeResult = self.dll.PM100D_getAccelMode(self.devSession, accelMode)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1150,7 +1150,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setAccelTau(self.devSession, accelTau)
+		pInvokeResult = self.dll.PM100D_setAccelTau(self.devSession, accelTau)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1188,7 +1188,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getAccelTau(self.devSession, attribute, accelTau)
+		pInvokeResult = self.dll.PM100D_getAccelTau(self.devSession, attribute, accelTau)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1223,7 +1223,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setInputAdapterType(self.devSession, type)
+		pInvokeResult = self.dll.PM100D_setInputAdapterType(self.devSession, type)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1262,7 +1262,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getInputAdapterType(self.devSession, type)
+		pInvokeResult = self.dll.PM100D_getInputAdapterType(self.devSession, type)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1289,7 +1289,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setAvgTime(self.devSession, avgTime)
+		pInvokeResult = self.dll.PM100D_setAvgTime(self.devSession, avgTime)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1321,7 +1321,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getAvgTime(self.devSession, attribute, avgTime)
+		pInvokeResult = self.dll.PM100D_getAvgTime(self.devSession, attribute, avgTime)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1360,7 +1360,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setAvgCnt(self.devSession, averageCount)
+		pInvokeResult = self.dll.PM100D_setAvgCnt(self.devSession, averageCount)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1393,7 +1393,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getAvgCnt(self.devSession, averageCount)
+		pInvokeResult = self.dll.PM100D_getAvgCnt(self.devSession, averageCount)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1416,7 +1416,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setAttenuation(self.devSession, attenuation)
+		pInvokeResult = self.dll.PM100D_setAttenuation(self.devSession, attenuation)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1454,7 +1454,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getAttenuation(self.devSession, attribute, attenuation)
+		pInvokeResult = self.dll.PM100D_getAttenuation(self.devSession, attribute, attenuation)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1478,7 +1478,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_startDarkAdjust(self.devSession)
+		pInvokeResult = self.dll.PM100D_startDarkAdjust(self.devSession)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1490,7 +1490,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_cancelDarkAdjust(self.devSession)
+		pInvokeResult = self.dll.PM100D_cancelDarkAdjust(self.devSession)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1513,7 +1513,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getDarkAdjustState(self.devSession, state)
+		pInvokeResult = self.dll.PM100D_getDarkAdjustState(self.devSession, state)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1534,7 +1534,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getDarkOffset(self.devSession, darkOffset)
+		pInvokeResult = self.dll.PM100D_getDarkOffset(self.devSession, darkOffset)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1565,7 +1565,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setBeamDia(self.devSession, beamDiameter)
+		pInvokeResult = self.dll.PM100D_setBeamDia(self.devSession, beamDiameter)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1607,7 +1607,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getBeamDia(self.devSession, attribute, beamDiameter)
+		pInvokeResult = self.dll.PM100D_getBeamDia(self.devSession, attribute, beamDiameter)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1636,7 +1636,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setWavelength(self.devSession, wavelength)
+		pInvokeResult = self.dll.PM100D_setWavelength(self.devSession, wavelength)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1676,7 +1676,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getWavelength(self.devSession, attribute, wavelength)
+		pInvokeResult = self.dll.PM100D_getWavelength(self.devSession, attribute, wavelength)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1699,7 +1699,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setPhotodiodeResponsivity(self.devSession, response)
+		pInvokeResult = self.dll.PM100D_setPhotodiodeResponsivity(self.devSession, response)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1737,7 +1737,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPhotodiodeResponsivity(self.devSession, attribute, responsivity)
+		pInvokeResult = self.dll.PM100D_getPhotodiodeResponsivity(self.devSession, attribute, responsivity)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1760,7 +1760,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setThermopileResponsivity(self.devSession, response)
+		pInvokeResult = self.dll.PM100D_setThermopileResponsivity(self.devSession, response)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1798,7 +1798,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getThermopileResponsivity(self.devSession, attribute, responsivity)
+		pInvokeResult = self.dll.PM100D_getThermopileResponsivity(self.devSession, attribute, responsivity)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1821,7 +1821,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setPyrosensorResponsivity(self.devSession, response)
+		pInvokeResult = self.dll.PM100D_setPyrosensorResponsivity(self.devSession, response)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1859,7 +1859,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPyrosensorResponsivity(self.devSession, attribute, responsivity)
+		pInvokeResult = self.dll.PM100D_getPyrosensorResponsivity(self.devSession, attribute, responsivity)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1890,7 +1890,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setCurrentAutoRange(self.devSession, currentAutorangeMode)
+		pInvokeResult = self.dll.PM100D_setCurrentAutoRange(self.devSession, currentAutorangeMode)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1921,7 +1921,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getCurrentAutorange(self.devSession, currentAutorangeMode)
+		pInvokeResult = self.dll.PM100D_getCurrentAutorange(self.devSession, currentAutorangeMode)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1944,7 +1944,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setCurrentRange(self.devSession, current_to_Measure)
+		pInvokeResult = self.dll.PM100D_setCurrentRange(self.devSession, current_to_Measure)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -1980,7 +1980,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getCurrentRange(self.devSession, attribute, currentValue)
+		pInvokeResult = self.dll.PM100D_getCurrentRange(self.devSession, attribute, currentValue)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2009,7 +2009,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setCurrentRef(self.devSession, currentReferenceValue)
+		pInvokeResult = self.dll.PM100D_setCurrentRef(self.devSession, currentReferenceValue)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2051,7 +2051,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getCurrentRef(self.devSession, attribute, currentReferenceValue)
+		pInvokeResult = self.dll.PM100D_getCurrentRef(self.devSession, attribute, currentReferenceValue)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2082,7 +2082,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setCurrentRefState(self.devSession, currentReferenceState)
+		pInvokeResult = self.dll.PM100D_setCurrentRefState(self.devSession, currentReferenceState)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2113,7 +2113,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getCurrentRefState(self.devSession, currentReferenceState)
+		pInvokeResult = self.dll.PM100D_getCurrentRefState(self.devSession, currentReferenceState)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2136,7 +2136,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setEnergyRange(self.devSession, energyToMeasure)
+		pInvokeResult = self.dll.PM100D_setEnergyRange(self.devSession, energyToMeasure)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2172,7 +2172,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getEnergyRange(self.devSession, attribute, energyValue)
+		pInvokeResult = self.dll.PM100D_getEnergyRange(self.devSession, attribute, energyValue)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2203,7 +2203,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setEnergyRef(self.devSession, energyReferenceValue)
+		pInvokeResult = self.dll.PM100D_setEnergyRef(self.devSession, energyReferenceValue)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2247,7 +2247,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getEnergyRef(self.devSession, attribute, energyReferenceValue)
+		pInvokeResult = self.dll.PM100D_getEnergyRef(self.devSession, attribute, energyReferenceValue)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2278,7 +2278,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setEnergyRefState(self.devSession, energyReferenceState)
+		pInvokeResult = self.dll.PM100D_setEnergyRefState(self.devSession, energyReferenceState)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2309,7 +2309,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getEnergyRefState(self.devSession, energyReferenceState)
+		pInvokeResult = self.dll.PM100D_getEnergyRefState(self.devSession, energyReferenceState)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2341,7 +2341,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getFreqRange(self.devSession, lowerFrequency, upperFrequency)
+		pInvokeResult = self.dll.PM100D_getFreqRange(self.devSession, lowerFrequency, upperFrequency)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2366,7 +2366,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setPowerAutoRange(self.devSession, powerAutorangeMode)
+		pInvokeResult = self.dll.PM100D_setPowerAutoRange(self.devSession, powerAutorangeMode)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2391,7 +2391,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPowerAutorange(self.devSession, powerAutorangeMode)
+		pInvokeResult = self.dll.PM100D_getPowerAutorange(self.devSession, powerAutorangeMode)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2406,7 +2406,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setPowerRange(self.devSession, power_to_Measure)
+		pInvokeResult = self.dll.PM100D_setPowerRange(self.devSession, power_to_Measure)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2436,7 +2436,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPowerRange(self.devSession, attribute, powerValue)
+		pInvokeResult = self.dll.PM100D_getPowerRange(self.devSession, attribute, powerValue)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2461,7 +2461,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setPowerRef(self.devSession, powerReferenceValue)
+		pInvokeResult = self.dll.PM100D_setPowerRef(self.devSession, powerReferenceValue)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2499,7 +2499,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPowerRef(self.devSession, attribute, powerReferenceValue)
+		pInvokeResult = self.dll.PM100D_getPowerRef(self.devSession, attribute, powerReferenceValue)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2524,7 +2524,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setPowerRefState(self.devSession, powerReferenceState)
+		pInvokeResult = self.dll.PM100D_setPowerRefState(self.devSession, powerReferenceState)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2549,7 +2549,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPowerRefState(self.devSession, powerReferenceState)
+		pInvokeResult = self.dll.PM100D_getPowerRefState(self.devSession, powerReferenceState)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2574,7 +2574,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setPowerUnit(self.devSession, powerUnit)
+		pInvokeResult = self.dll.PM100D_setPowerUnit(self.devSession, powerUnit)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2597,7 +2597,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPowerUnit(self.devSession, powerUnit)
+		pInvokeResult = self.dll.PM100D_getPowerUnit(self.devSession, powerUnit)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2625,7 +2625,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPowerCalibrationPointsInformation(self.devSession, index, serialNumber, calibrationDate, calibrationPointsCount, author, sensorPosition)
+		pInvokeResult = self.dll.PM100D_getPowerCalibrationPointsInformation(self.devSession, index, serialNumber, calibrationDate, calibrationPointsCount, author, sensorPosition)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2647,7 +2647,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPowerCalibrationPointsState(self.devSession, index, state)
+		pInvokeResult = self.dll.PM100D_getPowerCalibrationPointsState(self.devSession, index, state)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2669,7 +2669,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setPowerCalibrationPointsState(self.devSession, index, state)
+		pInvokeResult = self.dll.PM100D_setPowerCalibrationPointsState(self.devSession, index, state)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2693,7 +2693,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPowerCalibrationPoints(self.devSession, index, pointCounts, wavelengths, powers)
+		pInvokeResult = self.dll.PM100D_getPowerCalibrationPoints(self.devSession, index, pointCounts, wavelengths, powers)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2723,7 +2723,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setPowerCalibrationPoints(self.devSession, index, pointCounts, wavelengths, powers, author, sensorPosition)
+		pInvokeResult = self.dll.PM100D_setPowerCalibrationPoints(self.devSession, index, pointCounts, wavelengths, powers, author, sensorPosition)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2739,7 +2739,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_reinitSensor(self.devSession)
+		pInvokeResult = self.dll.PM100D_reinitSensor(self.devSession)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2770,7 +2770,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setVoltageAutoRange(self.devSession, voltageAutorangeMode)
+		pInvokeResult = self.dll.PM100D_setVoltageAutoRange(self.devSession, voltageAutorangeMode)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2801,7 +2801,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getVoltageAutorange(self.devSession, voltageAutorangeMode)
+		pInvokeResult = self.dll.PM100D_getVoltageAutorange(self.devSession, voltageAutorangeMode)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2824,7 +2824,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setVoltageRange(self.devSession, voltage_to_Measure)
+		pInvokeResult = self.dll.PM100D_setVoltageRange(self.devSession, voltage_to_Measure)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2860,7 +2860,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getVoltageRange(self.devSession, attribute, voltageValue)
+		pInvokeResult = self.dll.PM100D_getVoltageRange(self.devSession, attribute, voltageValue)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2884,7 +2884,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getVoltageRanges(self.devSession, voltageValues, rangeCount)
+		pInvokeResult = self.dll.PM100D_getVoltageRanges(self.devSession, voltageValues, rangeCount)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2913,7 +2913,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setVoltageRef(self.devSession, voltageReferenceValue)
+		pInvokeResult = self.dll.PM100D_setVoltageRef(self.devSession, voltageReferenceValue)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2955,7 +2955,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getVoltageRef(self.devSession, attribute, voltageReferenceValue)
+		pInvokeResult = self.dll.PM100D_getVoltageRef(self.devSession, attribute, voltageReferenceValue)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -2986,7 +2986,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setVoltageRefState(self.devSession, voltageReferenceState)
+		pInvokeResult = self.dll.PM100D_setVoltageRefState(self.devSession, voltageReferenceState)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3017,7 +3017,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getVoltageRefState(self.devSession, voltageReferenceState)
+		pInvokeResult = self.dll.PM100D_getVoltageRefState(self.devSession, voltageReferenceState)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3050,7 +3050,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setPeakThreshold(self.devSession, peakThreshold)
+		pInvokeResult = self.dll.PM100D_setPeakThreshold(self.devSession, peakThreshold)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3094,7 +3094,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPeakThreshold(self.devSession, attribute, peakThreshold)
+		pInvokeResult = self.dll.PM100D_getPeakThreshold(self.devSession, attribute, peakThreshold)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3116,7 +3116,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setExtNtcParameter(self.devSession, r0Coefficient, betaCoefficient)
+		pInvokeResult = self.dll.PM100D_setExtNtcParameter(self.devSession, r0Coefficient, betaCoefficient)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3153,7 +3153,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getExtNtcParameter(self.devSession, attribute, r0Coefficient, betaCoefficient)
+		pInvokeResult = self.dll.PM100D_getExtNtcParameter(self.devSession, attribute, r0Coefficient, betaCoefficient)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3184,7 +3184,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setFilterPosition(self.devSession, filterPosition)
+		pInvokeResult = self.dll.PM100D_setFilterPosition(self.devSession, filterPosition)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3215,7 +3215,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getFilterPosition(self.devSession, filterPosition)
+		pInvokeResult = self.dll.PM100D_getFilterPosition(self.devSession, filterPosition)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3246,7 +3246,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setFilterAutoMode(self.devSession, filterAutoPositionDetection)
+		pInvokeResult = self.dll.PM100D_setFilterAutoMode(self.devSession, filterAutoPositionDetection)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3277,7 +3277,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getFilterAutoMode(self.devSession, filterAutoPositionDetection)
+		pInvokeResult = self.dll.PM100D_getFilterAutoMode(self.devSession, filterAutoPositionDetection)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3309,7 +3309,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getAnalogOutputSlopeRange(self.devSession, minSlope, maxSlope)
+		pInvokeResult = self.dll.PM100D_getAnalogOutputSlopeRange(self.devSession, minSlope, maxSlope)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3332,7 +3332,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setAnalogOutputSlope(self.devSession, slope)
+		pInvokeResult = self.dll.PM100D_setAnalogOutputSlope(self.devSession, slope)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3372,7 +3372,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getAnalogOutputSlope(self.devSession, attribute, slope)
+		pInvokeResult = self.dll.PM100D_getAnalogOutputSlope(self.devSession, attribute, slope)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3404,7 +3404,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getAnalogOutputVoltageRange(self.devSession, minVoltage, maxVoltage)
+		pInvokeResult = self.dll.PM100D_getAnalogOutputVoltageRange(self.devSession, minVoltage, maxVoltage)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3444,7 +3444,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getAnalogOutputVoltage(self.devSession, attribute, voltage)
+		pInvokeResult = self.dll.PM100D_getAnalogOutputVoltage(self.devSession, attribute, voltage)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3472,7 +3472,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPositionAnalogOutputSlopeRange(self.devSession, minSlope, maxSlope)
+		pInvokeResult = self.dll.PM100D_getPositionAnalogOutputSlopeRange(self.devSession, minSlope, maxSlope)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3495,7 +3495,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setPositionAnalogOutputSlope(self.devSession, slope)
+		pInvokeResult = self.dll.PM100D_setPositionAnalogOutputSlope(self.devSession, slope)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3535,7 +3535,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPositionAnalogOutputSlope(self.devSession, attribute, slope)
+		pInvokeResult = self.dll.PM100D_getPositionAnalogOutputSlope(self.devSession, attribute, slope)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3567,7 +3567,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPositionAnalogOutputVoltageRange(self.devSession, minVoltage, maxVoltage)
+		pInvokeResult = self.dll.PM100D_getPositionAnalogOutputVoltageRange(self.devSession, minVoltage, maxVoltage)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3610,7 +3610,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPositionAnalogOutputVoltage(self.devSession, attribute, voltageX, voltageY)
+		pInvokeResult = self.dll.PM100D_getPositionAnalogOutputVoltage(self.devSession, attribute, voltageX, voltageY)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3645,7 +3645,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measCurrent(self.devSession, current)
+		pInvokeResult = self.dll.PM100D_measCurrent(self.devSession, current)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3680,7 +3680,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measVoltage(self.devSession, voltage)
+		pInvokeResult = self.dll.PM100D_measVoltage(self.devSession, voltage)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3707,7 +3707,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measPower(self.devSession, power)
+		pInvokeResult = self.dll.PM100D_measPower(self.devSession, power)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3734,7 +3734,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measEnergy(self.devSession, energy)
+		pInvokeResult = self.dll.PM100D_measEnergy(self.devSession, energy)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3755,7 +3755,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measFreq(self.devSession, frequency)
+		pInvokeResult = self.dll.PM100D_measFreq(self.devSession, frequency)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3782,7 +3782,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measPowerDens(self.devSession, powerDensity)
+		pInvokeResult = self.dll.PM100D_measPowerDens(self.devSession, powerDensity)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3809,7 +3809,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measEnergyDens(self.devSession, energyDensity)
+		pInvokeResult = self.dll.PM100D_measEnergyDens(self.devSession, energyDensity)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3830,7 +3830,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measAuxAD0(self.devSession, voltage)
+		pInvokeResult = self.dll.PM100D_measAuxAD0(self.devSession, voltage)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3851,7 +3851,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measAuxAD1(self.devSession, voltage)
+		pInvokeResult = self.dll.PM100D_measAuxAD1(self.devSession, voltage)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3872,7 +3872,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measEmmHumidity(self.devSession, humidity)
+		pInvokeResult = self.dll.PM100D_measEmmHumidity(self.devSession, humidity)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3893,7 +3893,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measEmmTemperature(self.devSession, temperature)
+		pInvokeResult = self.dll.PM100D_measEmmTemperature(self.devSession, temperature)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3916,7 +3916,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measExtNtcTemperature(self.devSession, temperature)
+		pInvokeResult = self.dll.PM100D_measExtNtcTemperature(self.devSession, temperature)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3939,7 +3939,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_measExtNtcResistance(self.devSession, resistance)
+		pInvokeResult = self.dll.PM100D_measExtNtcResistance(self.devSession, resistance)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3961,7 +3961,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_meas4QPositions(self.devSession, xPosition, yPosition)
+		pInvokeResult = self.dll.PM100D_meas4QPositions(self.devSession, xPosition, yPosition)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -3985,7 +3985,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_meas4QVoltages(self.devSession, voltage1, voltage2, voltage3, voltage4)
+		pInvokeResult = self.dll.PM100D_meas4QVoltages(self.devSession, voltage1, voltage2, voltage3, voltage4)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4002,7 +4002,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setArrMeasurement(self.devSession, enableArrayMeasurement)
+		pInvokeResult = self.dll.PM100D_setArrMeasurement(self.devSession, enableArrayMeasurement)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4025,7 +4025,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getArrMeasurement(self.devSession, enableArrayMeasurement)
+		pInvokeResult = self.dll.PM100D_getArrMeasurement(self.devSession, enableArrayMeasurement)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4050,7 +4050,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPowerArrayMeasurement(self.devSession, count, timestamps, powerValues)
+		pInvokeResult = self.dll.PM100D_getPowerArrayMeasurement(self.devSession, count, timestamps, powerValues)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4079,7 +4079,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPowerMeasurementSequence(self.devSession, count, interval, powerValues)
+		pInvokeResult = self.dll.PM100D_getPowerMeasurementSequence(self.devSession, count, interval, powerValues)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4108,7 +4108,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getCurrentMeasurementSequence(self.devSession, count, interval, currentValues)
+		pInvokeResult = self.dll.PM100D_getCurrentMeasurementSequence(self.devSession, count, interval, currentValues)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4135,7 +4135,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getPowerDensityMeasurementSequence(self.devSession, count, interval, powerDensityValues)
+		pInvokeResult = self.dll.PM100D_getPowerDensityMeasurementSequence(self.devSession, count, interval, powerDensityValues)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4187,7 +4187,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setDigIoDirection(self.devSession, IO0, IO1, IO2, IO3)
+		pInvokeResult = self.dll.PM100D_setDigIoDirection(self.devSession, IO0, IO1, IO2, IO3)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4231,7 +4231,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getDigIoDirection(self.devSession, IO0, IO1, IO2, IO3)
+		pInvokeResult = self.dll.PM100D_getDigIoDirection(self.devSession, IO0, IO1, IO2, IO3)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4287,7 +4287,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setDigIoOutput(self.devSession, IO0, IO1, IO2, IO3)
+		pInvokeResult = self.dll.PM100D_setDigIoOutput(self.devSession, IO0, IO1, IO2, IO3)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4331,7 +4331,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getDigIoOutput(self.devSession, IO0, IO1, IO2, IO3)
+		pInvokeResult = self.dll.PM100D_getDigIoOutput(self.devSession, IO0, IO1, IO2, IO3)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4375,7 +4375,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getDigIoPort(self.devSession, IO0, IO1, IO2, IO3)
+		pInvokeResult = self.dll.PM100D_getDigIoPort(self.devSession, IO0, IO1, IO2, IO3)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4459,7 +4459,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_errorMessage(self.devSession, statusCode, description)
+		pInvokeResult = self.dll.PM100D_errorMessage(self.devSession, statusCode, description)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4499,7 +4499,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_errorQuery(self.devSession, errorNumber, errorMessage)
+		pInvokeResult = self.dll.PM100D_errorQuery(self.devSession, errorNumber, errorMessage)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4528,7 +4528,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_errorQueryMode(self.devSession, mode)
+		pInvokeResult = self.dll.PM100D_errorQueryMode(self.devSession, mode)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4538,7 +4538,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_reset(self.devSession)
+		pInvokeResult = self.dll.PM100D_reset(self.devSession)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4560,7 +4560,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_selfTest(self.devSession, selfTestResult, description)
+		pInvokeResult = self.dll.PM100D_selfTest(self.devSession, selfTestResult, description)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4594,7 +4594,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_revisionQuery(self.devSession, instrumentDriverRevision, firmwareRevision)
+		pInvokeResult = self.dll.PM100D_revisionQuery(self.devSession, instrumentDriverRevision, firmwareRevision)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4650,7 +4650,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_identificationQuery(self.devSession, manufacturerName, deviceName, serialNumber, firmwareRevision)
+		pInvokeResult = self.dll.PM100D_identificationQuery(self.devSession, manufacturerName, deviceName, serialNumber, firmwareRevision)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4671,7 +4671,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getCalibrationMsg(self.devSession, message)
+		pInvokeResult = self.dll.PM100D_getCalibrationMsg(self.devSession, message)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4859,7 +4859,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getSensorInfo(self.devSession, name, snr, message, pType, pStype, pFlags)
+		pInvokeResult = self.dll.PM100D_getSensorInfo(self.devSession, name, snr, message, pType, pStype, pFlags)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4874,7 +4874,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_writeRaw(self.devSession, command)
+		pInvokeResult = self.dll.PM100D_writeRaw(self.devSession, command)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4909,7 +4909,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_readRaw(self.devSession, buffer, size, returnCount)
+		pInvokeResult = self.dll.PM100D_readRaw(self.devSession, buffer, size, returnCount)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4924,7 +4924,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setTimeoutValue(self.devSession, value)
+		pInvokeResult = self.dll.PM100D_setTimeoutValue(self.devSession, value)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4941,7 +4941,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getTimeoutValue(self.devSession, value)
+		pInvokeResult = self.dll.PM100D_getTimeoutValue(self.devSession, value)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4962,7 +4962,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setDeviceBaudrate(self.devSession, baudrate)
+		pInvokeResult = self.dll.PM100D_setDeviceBaudrate(self.devSession, baudrate)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4979,7 +4979,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getDeviceBaudrate(self.devSession, baudrate)
+		pInvokeResult = self.dll.PM100D_getDeviceBaudrate(self.devSession, baudrate)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -4994,7 +4994,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_setDriverBaudrate(self.devSession, baudrate)
+		pInvokeResult = self.dll.PM100D_setDriverBaudrate(self.devSession, baudrate)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 
@@ -5011,7 +5011,7 @@ class TLPM:
 		Returns:
 			int: The return value, 0 is for success
 		"""
-		pInvokeResult = self.dll.TLPM_getDriverBaudrate(self.devSession, baudrate)
+		pInvokeResult = self.dll.PM100D_getDriverBaudrate(self.devSession, baudrate)
 		self.__testForError(pInvokeResult)
 		return pInvokeResult
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-from ctypes import cdll,c_long, c_ulong, c_uint16, c_uint32,byref,create_string_buffer,c_bool,c_char_p,c_int,c_int16,c_double, sizeof, c_voidp
+from ctypes import cdll,c_long, c_ulong,c_uint16, c_uint32,byref,create_string_buffer,c_bool,c_char_p,c_int,c_int16,c_double, sizeof, c_voidp
 from TLPM import TLPM
 import time
 import os
@@ -27,22 +27,26 @@ tlPM.open(resourceName, c_bool(True), c_bool(True))
 message = create_string_buffer(1024)
 tlPM.getCalibrationMsg(message)
 print(c_char_p(message.raw).value)
-
+#get calibration points information
+index = c_uint16(4)
+serialNumber = create_string_buffer(1024)
+calibrationDate = create_string_buffer(1024)
+calibrationPointsCount = c_uint16(10)
+author = create_string_buffer(1024)
+sensorPosition = c_uint16(10)
+wavelength = (c_double*8)()
+power = (c_double*8)()
+tlPM.getPowerCalibrationPointsInformation(index,serialNumber,calibrationDate,byref(calibrationPointsCount),author,byref(sensorPosition))
+print(c_char_p(serialNumber.raw).value)
+print(c_char_p(calibrationDate.raw).value)
+print(calibrationPointsCount.value)
+print(c_char_p(author.raw).value)
+print(sensorPosition.value)
+tlPM.getPowerCalibrationPoints(c_uint16(4),c_uint16(6),wavelength,power)
+for i in range(8):
+    print(wavelength[i].value)
 time.sleep(0.5)
 
-#print(tlPM.setAvgTime(c_double(0.1)))
-print(tlPM.setAvgCnt(c_int16(32)))
-avgcnt = c_int16(0)
-tlPM.getAvgCnt(byref(avgcnt))
-print(avgcnt.value)
-wavelength = c_double(470)
-print(wavelength.value)
-print(tlPM.setWavelength(wavelength))
-print(tlPM.setWavelength(c_double(470.)))
-time.sleep(0.1)
-tlPM.getWavelength(c_uint16(0),byref(wavelength))
-time.sleep(0.1)
-print(wavelength.value)
 power_measurements = []
 times = []
 count = 0

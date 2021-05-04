@@ -30,17 +30,21 @@ print(c_char_p(message.raw).value)
 
 time.sleep(0.5)
 
-power_measurements = []
-times = []
-count = 0
-while count < 20:
-    power =  c_double()
-    tlPM.measPower(byref(power))
-    power_measurements.append(power.value)
-    times.append(datetime.now())
-    print(power.value)
-    count+=1
-    time.sleep(0.2)
+wavelengths = [400, 470, 540]
+for i in range(3):
+    print(wavelengths[i])
+    power_measurements = []
+    times = []
+    count = 0
+    tlPM.setWavelength(c_uint32(wavelengths[i]))
+    while count < 20:
+        power =  c_double()
+        tlPM.measPower(byref(power))
+        power_measurements.append(power.value)
+        times.append(datetime.now())
+        print(power.value)
+        count+=1
+        time.sleep(0.2)
 
 tlPM.close()
 print('End program')
